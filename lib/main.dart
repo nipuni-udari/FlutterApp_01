@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart'; // Import the login screen
+import 'screens/splash_screen.dart'; // Import the splash screen
+import 'screens/welcome_screen.dart'; // Import the WelcomeScreen
 
-void main() => runApp(MaterialApp(
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(), // Use LoginScreen here
-    ));
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white, // Set the background color
+      ),
+      home: SplashScreen(), // Display the SplashScreen first
+    );
+  }
+}
