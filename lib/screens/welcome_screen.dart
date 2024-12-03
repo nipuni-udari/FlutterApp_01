@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/Signup_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -98,7 +99,12 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                       borderRadius: BorderRadius.circular(10),
                       child: InkWell(
                         onTap: () {
-                          // Add your navigation or action here
+                          // Navigate to Signup_screen.dart
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SignupScreen()),
+                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
