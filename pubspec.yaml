@@ -69,10 +69,11 @@ flutter:
     - assets/images/clock.png
     - assets/images/logo.png
     - assets/images/welcome.png
-    - assets/images/bg.jpg
+    - assets/images/bg.png
     - assets/images/twitter.png
     - assets/images/facebook.png
     - assets/images/google.png
+    - assets/images/robot.jpg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

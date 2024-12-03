@@ -24,7 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
       decoration: BoxDecoration(
         color: myColor,
         image: DecorationImage(
-          image: const AssetImage("assets/images/bg.jpg"),
+          image: const AssetImage("assets/images/robot.jpg"),
           fit: BoxFit.cover,
           colorFilter:
               ColorFilter.mode(myColor.withOpacity(0.3), BlendMode.dstATop),
@@ -192,10 +192,6 @@ class _SignupScreenState extends State<SignupScreen> {
           child: _buildInputField(passwordController, isPassword: true),
         ),
         const SizedBox(height: 20),
-        FadeInUp(
-          duration: const Duration(milliseconds: 2600),
-          child: _buildRememberForgot(),
-        ),
         const SizedBox(height: 20),
         FadeInUp(
           duration: const Duration(milliseconds: 2700),
@@ -226,28 +222,6 @@ class _SignupScreenState extends State<SignupScreen> {
         suffixIcon: isPassword ? Icon(Icons.remove_red_eye) : Icon(Icons.done),
       ),
       obscureText: isPassword,
-    );
-  }
-
-  Widget _buildRememberForgot() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Checkbox(
-                value: rememberUser,
-                onChanged: (value) {
-                  setState(() {
-                    rememberUser = value!;
-                  });
-                }),
-            _buildGreyText("Remember me"),
-          ],
-        ),
-        TextButton(
-            onPressed: () {}, child: _buildGreyText("I forgot my password"))
-      ],
     );
   }
 

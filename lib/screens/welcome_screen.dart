@@ -31,14 +31,25 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 1.6,
                   decoration: BoxDecoration(
-                    color: Color(0xFF674AEF),
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF674AEF),
+                        Color.fromARGB(255, 11, 4, 43),
+                      ], // Define your gradient colors here
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
                     borderRadius:
                         BorderRadius.only(bottomRight: Radius.circular(70)),
                   ),
                   child: Center(
                     child: Image.asset(
                       "assets/images/welcome.png", // Make sure this is the correct image path
-                      scale: 0.8, // Adjust scale if necessary
+                      width: MediaQuery.of(context).size.width *
+                          0.7, // Adjust the image width (70% of the screen width)
+                      height: MediaQuery.of(context).size.height *
+                          0.5, // Adjust the image height (30% of the screen height)
+                      fit: BoxFit.contain, // Adjust how the image fits
                     ),
                   ),
                 ),
@@ -52,7 +63,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                 height: MediaQuery.of(context).size.height /
                     2.666, // Adjust as needed
                 decoration: BoxDecoration(
-                  color: Color(0xFF674AEF),
+                  color: Color.fromARGB(255, 11, 4, 43), // Background color
                 ),
               ),
             ),
@@ -64,7 +75,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                 height: MediaQuery.of(context).size.height / 2.66,
                 padding: EdgeInsets.only(top: 40, bottom: 30),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 244, 243, 245),
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(70),
                   ),
@@ -73,7 +84,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Main Topic",
+                      "The most Secure Platform for Customers",
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w600,
@@ -85,7 +96,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
-                        "Technology is more important",
+                        "Built-in Fingerprint, face recognition, and more, keeping you completely safe",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 17,
@@ -94,29 +105,35 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ),
                     SizedBox(height: 60),
-                    Material(
-                      color: Color(0xFF674AEF),
-                      borderRadius: BorderRadius.circular(10),
-                      child: InkWell(
-                        onTap: () {
+                    // Get Started Button with adjusted width
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width *
+                          0.6, // 50% of screen width
+                      child: ElevatedButton(
+                        onPressed: () {
                           // Navigate to Signup_screen.dart
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SignupScreen()),
+                              builder: (context) => SignupScreen(),
+                            ),
                           );
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 80),
-                          child: const Text(
-                            "Get Started",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          elevation: 20,
+                          shadowColor: const Color.fromARGB(255, 140, 153,
+                              253), // Use the desired shadow color
+                          minimumSize: const Size.fromHeight(60),
+                          backgroundColor: Color.fromARGB(255, 116, 86, 247),
+                          foregroundColor: Colors.white, // Text color
+                        ),
+                        child: const Text(
+                          "Get Started",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
                           ),
                         ),
                       ),
