@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart'; // Import animate_do package
+import 'package:animate_do/animate_do.dart';
+import 'dart:convert'; // Import for json decoding
+
+import 'package:http/http.dart' as http; // Import the http package
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -16,6 +19,72 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController mobileController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  bool isLoading = false; // To show loading indicator when signing up
+  String errorMessage = ""; // To store any error message
+
+  // Function to handle sign-up
+  Future<void> _signUp() async {
+    // Validate input fields
+    if (usernameController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        mobileController.text.isEmpty) {
+      setState(() {
+        errorMessage = "Please fill in all fields.";
+      });
+      return;
+    }
+
+    setState(() {
+      isLoading = true; // Show loading indicator
+      errorMessage = ""; // Reset any previous error message
+    });
+
+    final String url =
+        'http://192.168.93.141/FlutterProjects/newapp/lib/php/register.php'; // Replace with your actual server URL
+
+    try {
+      // Send POST request with form data
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'USERNAME': usernameController.text,
+          'PASSWORD': passwordController.text,
+          'EMAIL': emailController.text,
+          'MOBILE_NO': mobileController.text,
+        },
+      );
+
+      // Decode the JSON response
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      setState(() {
+        isLoading = false; // Hide loading indicator
+      });
+
+      // Check if registration was successful
+      if (responseData['success']) {
+        // Registration success
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Registration Successful")));
+        // Navigate to the login screen
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        // Registration failed
+        setState(() {
+          errorMessage =
+              responseData['message'] ?? "An unknown error occurred.";
+        });
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false; // Hide loading indicator on error
+        errorMessage = "An error occurred. Please try again.";
+      });
+      print(error.toString()); // Log the error for debugging
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,58 +106,9 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: const Color.fromARGB(0, 174, 22, 245),
         body: Stack(
           children: [
-            // Background Images with FadeInUp animation
-            Positioned(
-              left: 30,
-              width: 80,
-              height: 200,
-              child: FadeInUp(
-                duration: const Duration(seconds: 1),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/light-1.png'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 140,
-              width: 80,
-              height: 150,
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 1200),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/light-2.png'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 40,
-              top: 40,
-              width: 80,
-              height: 150,
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 1300),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/clock.png'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Top Part with Sign Up Title and Icon
                 Padding(
                   padding: const EdgeInsets.only(top: 80.0),
                   child: FadeInUp(
@@ -96,7 +116,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: _buildTop(),
                   ),
                 ),
-
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
@@ -114,6 +133,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // Build top section with icon and title
   Widget _buildTop() {
     return SizedBox(
       width: mediaSize.width,
@@ -138,6 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // Build the bottom section with input fields and button
   Widget _buildBottom() {
     return Card(
       shape: const RoundedRectangleBorder(
@@ -150,10 +171,21 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // Build the form with input fields
   Widget _buildForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Display any error messages
+        if (errorMessage.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: Text(
+              errorMessage,
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+
         FadeInUp(
           duration: const Duration(milliseconds: 1800),
           child: Text(
@@ -211,16 +243,11 @@ class _SignupScreenState extends State<SignupScreen> {
           child: _buildSignupButton(),
         ),
         const SizedBox(height: 20), // Reduced space before next section
-        // Removed Other Signup options
-        const SizedBox(height: 30), // Reduced space before the "Sign in" option
-        FadeInUp(
-          duration: const Duration(milliseconds: 2800),
-          child: _buildSignInOption(),
-        ),
       ],
     );
   }
 
+  // Build a text widget with grey color
   Widget _buildGreyText(String text) {
     return Text(
       text,
@@ -228,8 +255,9 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // Build input field for text input
   Widget _buildInputField(TextEditingController controller,
-      {isPassword = false}) {
+      {bool isPassword = false}) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -239,13 +267,12 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // Build the sign-up button
   Widget _buildSignupButton() {
     return ElevatedButton(
       onPressed: () {
-        debugPrint("Username : ${usernameController.text}");
-        debugPrint("Mobile : ${mobileController.text}");
-        debugPrint("Email : ${emailController.text}");
-        debugPrint("Password : ${passwordController.text}");
+        // Call _signUp() when the signup button is pressed
+        _signUp();
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
@@ -255,31 +282,10 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: Color.fromARGB(255, 116, 86, 247),
         foregroundColor: Colors.white, // Text color
       ),
-      child: const Text("SIGN UP"),
-    );
-  }
-
-  Widget _buildSignInOption() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text("Already have an account? ",
-            style: TextStyle(color: Colors.grey)),
-        TextButton(
-          onPressed: () {
-            // Navigate to the sign-in screen (you should define this route in your app)
-            Navigator.pushReplacementNamed(context, '/login');
-          },
-          child: Text(
-            "Sign In",
-            style: TextStyle(
-              color: myColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-        ),
-      ],
+      child: isLoading
+          ? CircularProgressIndicator(
+              color: Colors.white) // Show loading indicator
+          : const Text("SIGN UP"),
     );
   }
 }
