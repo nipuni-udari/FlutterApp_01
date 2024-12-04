@@ -11,20 +11,23 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   late Color myColor;
   late Size mediaSize;
+  late bool isLandscape;
   TextEditingController usernameController = TextEditingController();
+  TextEditingController mobileController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  bool rememberUser = false;
 
   @override
   Widget build(BuildContext context) {
     myColor = Color(0xFF674AEF);
     mediaSize = MediaQuery.of(context).size;
+    isLandscape = mediaSize.width > mediaSize.height;
+
     return Container(
       decoration: BoxDecoration(
         color: myColor,
         image: DecorationImage(
-          image: const AssetImage("assets/images/robot.jpg"),
+          image: const AssetImage("assets/images/bg.jpg"),
           fit: BoxFit.cover,
           colorFilter:
               ColorFilter.mode(myColor.withOpacity(0.3), BlendMode.dstATop),
@@ -81,7 +84,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             ),
-            // Main content goes inside a Column for more flexibility
+
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -93,11 +96,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: _buildTop(),
                   ),
                 ),
-                // Spacer for flexibility, especially when rotating
+
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.all(32.0),
+                      padding: EdgeInsets.all(
+                          isLandscape ? 12 : 20), // Reduced padding
                       child: _buildBottom(),
                     ),
                   ),
@@ -113,12 +117,12 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _buildTop() {
     return SizedBox(
       width: mediaSize.width,
-      child: const Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.account_circle_rounded,
-            size: 100,
+            size: isLandscape ? 80 : 100,
             color: Colors.white,
           ),
           Text(
@@ -126,7 +130,7 @@ class _SignupScreenState extends State<SignupScreen> {
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 40,
+                fontSize: isLandscape ? 30 : 40,
                 letterSpacing: 2),
           ),
         ],
@@ -137,11 +141,10 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _buildBottom() {
     return Card(
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.all(Radius.circular(30)), // Round all corners
+        borderRadius: BorderRadius.all(Radius.circular(30)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(24.0), // Reduced padding
         child: _buildForm(),
       ),
     );
@@ -156,15 +159,17 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Text(
             "Create Account",
             style: TextStyle(
-                color: myColor, fontSize: 32, fontWeight: FontWeight.w500),
+                color: myColor,
+                fontSize: isLandscape ? 28 : 32, // Adjust font size
+                fontWeight: FontWeight.w500),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10), // Reduced space between title and text
         FadeInUp(
           duration: const Duration(milliseconds: 1900),
           child: _buildGreyText("Please sign up with your information"),
         ),
-        const SizedBox(height: 100),
+        const SizedBox(height: 20), // Reduced space after instruction text
         FadeInUp(
           duration: const Duration(milliseconds: 2000),
           child: _buildGreyText("Username"),
@@ -173,7 +178,16 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: const Duration(milliseconds: 2100),
           child: _buildInputField(usernameController),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20), // Reduced space after username input field
+        FadeInUp(
+          duration: const Duration(milliseconds: 2000),
+          child: _buildGreyText("Mobile"),
+        ),
+        FadeInUp(
+          duration: const Duration(milliseconds: 2100),
+          child: _buildInputField(mobileController),
+        ),
+        const SizedBox(height: 20), // Reduced space after mobile input field
         FadeInUp(
           duration: const Duration(milliseconds: 2200),
           child: _buildGreyText("Email address"),
@@ -182,7 +196,7 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: const Duration(milliseconds: 2300),
           child: _buildInputField(emailController),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20), // Reduced space after email input field
         FadeInUp(
           duration: const Duration(milliseconds: 2400),
           child: _buildGreyText("Password"),
@@ -191,18 +205,18 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: const Duration(milliseconds: 2500),
           child: _buildInputField(passwordController, isPassword: true),
         ),
-        const SizedBox(height: 20),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10), // Reduced space after password input field
         FadeInUp(
           duration: const Duration(milliseconds: 2700),
           child: _buildSignupButton(),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20), // Reduced space before next section
+        // Removed Other Signup options
+        const SizedBox(height: 30), // Reduced space before the "Sign in" option
         FadeInUp(
           duration: const Duration(milliseconds: 2800),
-          child: _buildOtherSignup(),
+          child: _buildSignInOption(),
         ),
-        const SizedBox(height: 40),
       ],
     );
   }
@@ -229,6 +243,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return ElevatedButton(
       onPressed: () {
         debugPrint("Username : ${usernameController.text}");
+        debugPrint("Mobile : ${mobileController.text}");
         debugPrint("Email : ${emailController.text}");
         debugPrint("Password : ${passwordController.text}");
       },
@@ -241,36 +256,6 @@ class _SignupScreenState extends State<SignupScreen> {
         foregroundColor: Colors.white, // Text color
       ),
       child: const Text("SIGN UP"),
-    );
-  }
-
-  Widget _buildOtherSignup() {
-    return Center(
-      child: Column(
-        children: [
-          FadeInUp(
-            duration: const Duration(milliseconds: 2900),
-            child: _buildGreyText("Or Sign up with"),
-          ),
-          const SizedBox(height: 10),
-          FadeInUp(
-            duration: const Duration(milliseconds: 3000),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Tab(icon: Image.asset("assets/images/facebook.png")),
-                Tab(icon: Image.asset("assets/images/twitter.png")),
-                Tab(icon: Image.asset("assets/images/google.png")),
-              ],
-            ),
-          ),
-          const SizedBox(height: 30), // Add spacing before "Sign in"
-          FadeInUp(
-            duration: const Duration(milliseconds: 3100),
-            child: _buildSignInOption(),
-          ),
-        ],
-      ),
     );
   }
 

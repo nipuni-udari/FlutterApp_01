@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newapp/screens/Signup_screen.dart';
+import 'package:newapp/screens/signup_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -111,7 +111,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                           0.6, // 50% of screen width
                       child: ElevatedButton(
                         onPressed: () {
-                          // Navigate to Signup_screen.dart
+                          // Navigate to signup_screen.dart
                           Navigator.push(
                             context,
                             MaterialPageRoute(

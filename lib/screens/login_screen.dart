@@ -163,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
           duration: const Duration(milliseconds: 1900),
           child: _buildGreyText("Please log in to your account"),
         ),
-        const SizedBox(height: 100),
+        const SizedBox(height: 40),
         FadeInUp(
           duration: const Duration(milliseconds: 2000),
           child: _buildGreyText("Email address"),
@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 40),
         FadeInUp(
           duration: const Duration(milliseconds: 2600),
-          child: _buildOtherLogin(),
+          child: _buildSignUpOption(),
         ),
         const SizedBox(height: 40),
       ],
@@ -265,36 +265,6 @@ class _LoginScreenState extends State<LoginScreen> {
         foregroundColor: Colors.white, // Text color
       ),
       child: const Text("LOGIN"),
-    );
-  }
-
-  Widget _buildOtherLogin() {
-    return Center(
-      child: Column(
-        children: [
-          FadeInUp(
-            duration: const Duration(milliseconds: 2700),
-            child: _buildGreyText("Or login with"),
-          ),
-          const SizedBox(height: 10),
-          FadeInUp(
-            duration: const Duration(milliseconds: 2800),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Tab(icon: Image.asset("assets/images/facebook.png")),
-                Tab(icon: Image.asset("assets/images/twitter.png")),
-                Tab(icon: Image.asset("assets/images/google.png")),
-              ],
-            ),
-          ),
-          const SizedBox(height: 30), // Add spacing before "Sign up"
-          FadeInUp(
-            duration: const Duration(milliseconds: 2900),
-            child: _buildSignUpOption(),
-          ),
-        ],
-      ),
     );
   }
 
