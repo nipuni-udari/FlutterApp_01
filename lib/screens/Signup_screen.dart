@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'dart:convert'; // Import for json decoding
-
-import 'package:http/http.dart' as http; // Import the http package
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -20,8 +19,20 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  bool isLoading = false; // To show loading indicator when signing up
-  String errorMessage = ""; // To store any error message
+  bool isLoading = false; // To show loading indicator
+  String errorMessage = ""; // To store error messages
+  String successMessage = ""; // To store success messages
+
+  // Function to validate email
+  bool _isValidEmail(String email) {
+    final RegExp emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    return emailRegex.hasMatch(email);
+  }
+
+  // Function to validate phone number
+  bool _isValidPhone(String phone) {
+    return phone.length == 10 && int.tryParse(phone) != null;
+  }
 
   // Function to handle sign-up
   Future<void> _signUp() async {
@@ -32,20 +43,37 @@ class _SignupScreenState extends State<SignupScreen> {
         mobileController.text.isEmpty) {
       setState(() {
         errorMessage = "Please fill in all fields.";
+        successMessage = ""; // Clear success message
+      });
+      return;
+    }
+
+    if (!_isValidEmail(emailController.text)) {
+      setState(() {
+        errorMessage = "Please enter a valid email address.";
+        successMessage = ""; // Clear success message
+      });
+      return;
+    }
+
+    if (!_isValidPhone(mobileController.text)) {
+      setState(() {
+        errorMessage = "Please enter a valid 10-digit phone number.";
+        successMessage = ""; // Clear success message
       });
       return;
     }
 
     setState(() {
       isLoading = true; // Show loading indicator
-      errorMessage = ""; // Reset any previous error message
+      errorMessage = ""; // Clear error messages
+      successMessage = ""; // Clear previous success message
     });
 
     final String url =
         'http://192.168.93.141/FlutterProjects/newapp/lib/php/register.php'; // Replace with your actual server URL
 
     try {
-      // Send POST request with form data
       final response = await http.post(
         Uri.parse(url),
         body: {
@@ -56,31 +84,42 @@ class _SignupScreenState extends State<SignupScreen> {
         },
       );
 
-      // Decode the JSON response
-      final Map<String, dynamic> responseData = json.decode(response.body);
+      // Check if the response status is 200 (OK)
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
 
-      setState(() {
-        isLoading = false; // Hide loading indicator
-      });
-
-      // Check if registration was successful
-      if (responseData['success']) {
-        // Registration success
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Registration Successful")));
-        // Navigate to the login screen
-        Navigator.pushReplacementNamed(context, '/login');
-      } else {
-        // Registration failed
         setState(() {
-          errorMessage =
-              responseData['message'] ?? "An unknown error occurred.";
+          isLoading = false; // Hide loading indicator
+        });
+
+        if (responseData['success']) {
+          setState(() {
+            successMessage = "Registration Successful!";
+            errorMessage = ""; // Clear error messages
+          });
+          // Navigate to the login screen
+          Navigator.pushReplacementNamed(context, '/login');
+        } else {
+          setState(() {
+            errorMessage =
+                responseData['message'] ?? "Username already exists.";
+            successMessage = ""; // Clear success message
+          });
+        }
+      } else {
+        // If the status code is not 200, show a generic error message
+        setState(() {
+          isLoading = false; // Hide loading indicator
+          errorMessage = "Server error. Please try again later.";
+          successMessage = ""; // Clear success message
         });
       }
     } catch (error) {
       setState(() {
-        isLoading = false; // Hide loading indicator on error
-        errorMessage = "An error occurred. Please try again.";
+        isLoading = false; // Hide loading indicator
+        errorMessage =
+            "An error occurred. Please check your internet connection.";
+        successMessage = ""; // Clear success message
       });
       print(error.toString()); // Log the error for debugging
     }
@@ -133,7 +172,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Build top section with icon and title
   Widget _buildTop() {
     return SizedBox(
       width: mediaSize.width,
@@ -158,7 +196,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Build the bottom section with input fields and button
   Widget _buildBottom() {
     return Card(
       shape: const RoundedRectangleBorder(
@@ -171,18 +208,28 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Build the form with input fields
   Widget _buildForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Display any error messages
+        // Display error message
         if (errorMessage.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Text(
               errorMessage,
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+        // Display success message
+        if (successMessage.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: Text(
+              successMessage,
+              style:
+                  TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           ),
 
@@ -196,12 +243,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 fontWeight: FontWeight.w500),
           ),
         ),
-        const SizedBox(height: 10), // Reduced space between title and text
+        const SizedBox(height: 10),
         FadeInUp(
           duration: const Duration(milliseconds: 1900),
           child: _buildGreyText("Please sign up with your information"),
         ),
-        const SizedBox(height: 20), // Reduced space after instruction text
+        const SizedBox(height: 20),
         FadeInUp(
           duration: const Duration(milliseconds: 2000),
           child: _buildGreyText("Username"),
@@ -210,7 +257,7 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: const Duration(milliseconds: 2100),
           child: _buildInputField(usernameController),
         ),
-        const SizedBox(height: 20), // Reduced space after username input field
+        const SizedBox(height: 20),
         FadeInUp(
           duration: const Duration(milliseconds: 2000),
           child: _buildGreyText("Mobile"),
@@ -219,7 +266,7 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: const Duration(milliseconds: 2100),
           child: _buildInputField(mobileController),
         ),
-        const SizedBox(height: 20), // Reduced space after mobile input field
+        const SizedBox(height: 20),
         FadeInUp(
           duration: const Duration(milliseconds: 2200),
           child: _buildGreyText("Email address"),
@@ -228,7 +275,7 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: const Duration(milliseconds: 2300),
           child: _buildInputField(emailController),
         ),
-        const SizedBox(height: 20), // Reduced space after email input field
+        const SizedBox(height: 20),
         FadeInUp(
           duration: const Duration(milliseconds: 2400),
           child: _buildGreyText("Password"),
@@ -237,17 +284,22 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: const Duration(milliseconds: 2500),
           child: _buildInputField(passwordController, isPassword: true),
         ),
-        const SizedBox(height: 10), // Reduced space after password input field
+        const SizedBox(height: 10),
         FadeInUp(
           duration: const Duration(milliseconds: 2700),
           child: _buildSignupButton(),
         ),
-        const SizedBox(height: 20), // Reduced space before next section
+        const SizedBox(height: 20),
+
+        // Sign-In Option below Sign Up Button
+        FadeInUp(
+          duration: const Duration(milliseconds: 2800),
+          child: _buildSignUpOption(),
+        ),
       ],
     );
   }
 
-  // Build a text widget with grey color
   Widget _buildGreyText(String text) {
     return Text(
       text,
@@ -255,7 +307,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Build input field for text input
   Widget _buildInputField(TextEditingController controller,
       {bool isPassword = false}) {
     return TextField(
@@ -267,25 +318,44 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Build the sign-up button
   Widget _buildSignupButton() {
     return ElevatedButton(
-      onPressed: () {
-        // Call _signUp() when the signup button is pressed
-        _signUp();
-      },
+      onPressed: _signUp,
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
         elevation: 20,
         shadowColor: myColor,
         minimumSize: const Size.fromHeight(60),
         backgroundColor: Color.fromARGB(255, 116, 86, 247),
-        foregroundColor: Colors.white, // Text color
+        foregroundColor: Colors.white,
       ),
       child: isLoading
-          ? CircularProgressIndicator(
-              color: Colors.white) // Show loading indicator
+          ? CircularProgressIndicator(color: Colors.white)
           : const Text("SIGN UP"),
+    );
+  }
+
+  Widget _buildSignUpOption() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text("Do you have an account? ",
+            style: TextStyle(color: Colors.grey)),
+        TextButton(
+          onPressed: () {
+            // Navigate to the sign-in screen (you should define this route)
+            Navigator.pushReplacementNamed(context, '/login');
+          },
+          child: Text(
+            "Sign In",
+            style: TextStyle(
+              color: myColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
