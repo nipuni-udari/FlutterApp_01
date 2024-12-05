@@ -22,6 +22,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool isLoading = false; // To show loading indicator
   String errorMessage = ""; // To store error messages
   String successMessage = ""; // To store success messages
+  bool _isPasswordVisible = false; // Toggle for password visibility
 
   // Function to validate email
   bool _isValidEmail(String email) {
@@ -264,7 +265,8 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         FadeInUp(
           duration: const Duration(milliseconds: 2100),
-          child: _buildInputField(mobileController),
+          child: _buildInputField(mobileController,
+              keyboardType: TextInputType.phone),
         ),
         const SizedBox(height: 20),
         FadeInUp(
@@ -308,13 +310,26 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildInputField(TextEditingController controller,
-      {bool isPassword = false}) {
+      {bool isPassword = false,
+      TextInputType keyboardType = TextInputType.text}) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        suffixIcon: isPassword ? Icon(Icons.remove_red_eye) : Icon(Icons.done),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+              )
+            : Icon(Icons.done),
       ),
-      obscureText: isPassword,
+      obscureText: isPassword ? !_isPasswordVisible : false,
+      keyboardType: keyboardType,
     );
   }
 

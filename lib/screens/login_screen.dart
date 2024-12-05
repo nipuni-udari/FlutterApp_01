@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart'; // Import animate_do package
+import 'package:animate_do/animate_do.dart';
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,11 +16,15 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool rememberUser = false;
+  bool isLoading = false;
+  String errorMessage = '';
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     myColor = Color(0xFF674AEF);
     mediaSize = MediaQuery.of(context).size;
+
     return Container(
       decoration: BoxDecoration(
         color: myColor,
@@ -33,7 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: const Color.fromARGB(0, 174, 22, 245),
         body: Stack(
           children: [
-            // Background Images with FadeInUp animation
             Positioned(
               left: 30,
               width: 80,
@@ -80,11 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            // Main content goes inside a Column for more flexibility
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Top Part with Login Title and Icon
                 Padding(
                   padding: const EdgeInsets.only(top: 80.0),
                   child: FadeInUp(
@@ -92,12 +95,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: _buildTop(),
                   ),
                 ),
-                // Spacer for flexibility, especially when rotating
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.all(32.0),
-                      child: _buildBottom(),
+                      child: Column(
+                        children: [
+                          // Remove this error display to avoid duplication
+                          _buildBottom(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -136,8 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildBottom() {
     return Card(
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.all(Radius.circular(30)), // Round all corners
+        borderRadius: BorderRadius.all(Radius.circular(30)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -150,6 +156,19 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Display error message only once before "Welcome Back" text
+        if (errorMessage.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Text(
+              errorMessage,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         FadeInUp(
           duration: const Duration(milliseconds: 1800),
           child: Text(
@@ -163,37 +182,38 @@ class _LoginScreenState extends State<LoginScreen> {
           duration: const Duration(milliseconds: 1900),
           child: _buildGreyText("Please log in to your account"),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
+        const SizedBox(height: 20),
         FadeInUp(
-          duration: const Duration(milliseconds: 2000),
+          duration: const Duration(milliseconds: 2100),
           child: _buildGreyText("Email address"),
         ),
         FadeInUp(
-          duration: const Duration(milliseconds: 2100),
+          duration: const Duration(milliseconds: 2200),
           child: _buildInputField(emailController),
         ),
         const SizedBox(height: 40),
         FadeInUp(
-          duration: const Duration(milliseconds: 2200),
+          duration: const Duration(milliseconds: 2300),
           child: _buildGreyText("Password"),
         ),
         FadeInUp(
-          duration: const Duration(milliseconds: 2300),
+          duration: const Duration(milliseconds: 2400),
           child: _buildInputField(passwordController, isPassword: true),
         ),
         const SizedBox(height: 20),
         FadeInUp(
-          duration: const Duration(milliseconds: 2400),
+          duration: const Duration(milliseconds: 2500),
           child: _buildRememberForgot(),
         ),
         const SizedBox(height: 20),
         FadeInUp(
-          duration: const Duration(milliseconds: 2500),
+          duration: const Duration(milliseconds: 2600),
           child: _buildLoginButton(),
         ),
         const SizedBox(height: 40),
         FadeInUp(
-          duration: const Duration(milliseconds: 2600),
+          duration: const Duration(milliseconds: 2700),
           child: _buildSignUpOption(),
         ),
         const SizedBox(height: 40),
@@ -213,9 +233,20 @@ class _LoginScreenState extends State<LoginScreen> {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        suffixIcon: isPassword ? Icon(Icons.remove_red_eye) : Icon(Icons.done),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+              )
+            : Icon(Icons.done),
       ),
-      obscureText: isPassword,
+      obscureText: isPassword ? !_isPasswordVisible : false,
     );
   }
 
@@ -236,25 +267,43 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
         TextButton(
-          onPressed: () {
-            // Add your onPressed logic here
-          },
+          onPressed: () {},
           child: Text(
             "I forgot my password",
-            style: TextStyle(
-              color: myColor, // Set the desired text color
-            ),
+            style: TextStyle(color: myColor),
           ),
-        )
+        ),
       ],
     );
   }
 
   Widget _buildLoginButton() {
     return ElevatedButton(
-      onPressed: () {
-        debugPrint("Email : ${emailController.text}");
-        debugPrint("Password : ${passwordController.text}");
+      onPressed: () async {
+        // Dismiss the keyboard when login button is pressed
+        FocusScope.of(context).unfocus();
+
+        // Check if email and password are not empty
+        if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+          setState(() {
+            errorMessage = "Please enter both email and password.";
+          });
+          return;
+        }
+
+        // Start loading
+        setState(() {
+          isLoading = true;
+          errorMessage = ''; // Reset error message on login attempt
+        });
+
+        // Perform login
+        await _login();
+
+        // Stop loading
+        setState(() {
+          isLoading = false;
+        });
       },
       style: ElevatedButton.styleFrom(
         shape: const StadiumBorder(),
@@ -262,10 +311,51 @@ class _LoginScreenState extends State<LoginScreen> {
         shadowColor: myColor,
         minimumSize: const Size.fromHeight(60),
         backgroundColor: Color.fromARGB(255, 116, 86, 247),
-        foregroundColor: Colors.white, // Text color
+        foregroundColor: Colors.white,
       ),
-      child: const Text("LOGIN"),
+      child: isLoading
+          ? CircularProgressIndicator(color: Colors.white)
+          : Text(
+              'Login',
+              style: TextStyle(fontSize: 20),
+            ),
     );
+  }
+
+  Future<void> _login() async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'http://192.168.93.141/FlutterProjects/newapp/lib/php/login.php'),
+        body: {
+          'email': emailController.text,
+          'password': passwordController.text,
+        },
+      );
+      // debugPrint(response);
+      debugPrint(response.body);
+      final data = json.decode(response.body);
+
+      if (data['success']) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else if (data['message'] == 'User does not exist') {
+        setState(() {
+          errorMessage = 'User does not exist. Please check your email.';
+        });
+      } else if (data['message'] == 'Incorrect password') {
+        setState(() {
+          errorMessage = 'Incorrect password. Please try again.';
+        });
+      } else {
+        setState(() {
+          errorMessage = 'An error occurred. Please try again laterr.';
+        });
+      }
+    } catch (error) {
+      setState(() {
+        errorMessage = 'An error occurred. Please try again later.';
+      });
+    }
   }
 
   Widget _buildSignUpOption() {
@@ -276,7 +366,6 @@ class _LoginScreenState extends State<LoginScreen> {
             style: TextStyle(color: Colors.grey)),
         TextButton(
           onPressed: () {
-            // Navigate to the sign-up screen (you should define this route in your app)
             Navigator.pushReplacementNamed(context, '/signup');
           },
           child: Text(
