@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart'; // Import the splash screen
-import 'screens/welcome_screen.dart'; // Import the WelcomeScreen
-import 'screens/login_screen.dart'; // Import the LoginScreen
-import 'screens/signup_screen.dart'; // Import SignupScreen
-import 'screens/home_screen.dart'; // Import SignupScreen
+import 'screens/splash_screen.dart';
+import 'screens/welcome_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/mobile_register.dart';
+import 'screens/otp_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,11 +21,13 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/', // Set the initial route
       routes: {
-        '/': (context) => SplashScreen(), // SplashScreen route
-        '/welcome': (context) => WelcomeScreen(), // WelcomeScreen route
-        '/login': (context) => LoginScreen(), // LoginScreen route
-        '/signup': (context) => SignupScreen(), // SignupScreen route
-        '/home': (context) => HomeScreen(), // SignupScreen route
+        '/': (context) => SplashScreen(),
+        '/welcome': (context) => WelcomeScreen(),
+        '/login': (context) => LoginScreen(),
+        '/signup': (context) => SignupScreen(),
+        '/home': (context) => HomeScreen(),
+        '/mobile': (context) => MobileScreen(), // MobileScreen route
+        '/otp': (context) => OtpScreen(), // OtpScreen route
       },
     );
   }

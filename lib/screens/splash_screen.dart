@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Navigate to the WelcomeScreen after the delay
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
       );
     });
   }
