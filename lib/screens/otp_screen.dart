@@ -14,7 +14,7 @@ class _OtpScreenState extends State<OtpScreen> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Container(
-          // Apply gradient background here for the entire screen
+          // Apply gradient background for the entire screen
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -36,33 +36,17 @@ class _OtpScreenState extends State<OtpScreen> {
                     child: const Icon(
                       Icons.arrow_back,
                       size: 32,
-                      color: Colors
-                          .white, // Changed icon color to white for contrast
+                      color: Colors.white, // Icon color for better contrast
                     ),
                   ),
                 ),
                 const SizedBox(height: 18),
-                Container(
+                // Directly display the image without a surrounding container or gradient
+                Image.asset(
+                  'assets/images/illustration-2.png',
                   width: 200,
                   height: 200,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF674AEF),
-                        const Color.fromARGB(255, 11, 4, 43),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/images/illustration-3.png',
-                      fit: BoxFit
-                          .cover, // Ensures the image fits inside the circle
-                    ),
-                  ),
+                  fit: BoxFit.cover,
                 ),
                 const SizedBox(height: 24),
                 const Text(
@@ -70,8 +54,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors
-                        .white, // Changed text color to white for contrast
+                    color: Colors.white, // Text color for contrast
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -80,7 +63,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white70, // Light color for text
+                    color: Colors.white70, // Light text color
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -90,8 +73,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        const Color(0xFF674AEF)
-                            .withOpacity(0.7), // Slightly transparent gradient
+                        const Color(0xFF674AEF).withOpacity(0.7),
                         const Color.fromARGB(255, 11, 4, 43).withOpacity(0.7),
                       ],
                       begin: Alignment.topLeft,
@@ -148,7 +130,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white70, // Light color for text
+                    color: Colors.white70, // Light text color
                   ),
                   textAlign: TextAlign.center,
                 ),
