@@ -366,7 +366,7 @@ class _LoginScreenState extends State<LoginScreen> {
             style: TextStyle(color: Colors.grey)),
         TextButton(
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/signup');
+            Navigator.pushReplacementNamed(context, '/mobile');
           },
           child: Text(
             "Sign Up",

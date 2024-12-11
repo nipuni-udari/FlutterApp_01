@@ -72,7 +72,7 @@ class _SignupScreenState extends State<SignupScreen> {
     });
 
     final String url =
-        'http://192.168.93.141/FlutterProjects/newapp/lib/php/register.php'; // Replace with your actual server URL
+        'http://192.168.93.141/FlutterProjects/newapp/lib/php/signup.php'; // Replace with your actual server URL
 
     try {
       final response = await http.post(

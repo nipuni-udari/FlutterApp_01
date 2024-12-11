@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newapp/screens/mobile_register.dart';
+import 'package:newapp/screens/login_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -113,7 +113,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MobileScreen(),
+                              builder: (context) => LoginScreen(),
                             ),
                           );
                         },
