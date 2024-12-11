@@ -5,48 +5,58 @@ include('connect.php');
 include('ESMSWS.php');
 
 $da = date('Y-m-d H:i:s');
-$randomdata = rand(10000,99999);
+$randomdata = rand(10000, 99999);
 
-$qrt_DB_HRIS ="SELECT * FROM FLUTTER_APP_USERS Where MOBILE_NO ='".$_POST['contact']."' limit 1";
+if (isset($_POST['contact'])) {
+    $contact = $_POST['contact'];
 
+    // Check if the user already exists
+    $query = "SELECT * FROM FLUTTER_APP_USERS WHERE MOBILE_NO = '$contact'";
+    $result = mysqli_query($conn, $query);
 
-$result_DB_HRIS = mysqli_query($DB_HRIS_conn, $qrt_DB_HRIS);
-if (mysqli_num_rows($result_DB_HRIS) > 0) {
-    $i = 1;
-     while($row1_DB_HRIS = mysqli_fetch_assoc($result_DB_HRIS)) {
-       
-$to = $_POST['contact'];
-$subject = "OTP:$randomdata";
-$etxt =  "Dear User, Please Use the following OTP:$randomdata to complete your online request.";
-$footer = "IAssist Team";
-$client_id = "";
-//$utxt = $_GET['utxt'];
+    if (mysqli_num_rows($result) > 0) {
+        // User already exists
+        echo json_encode([
+            'status' => 'exists',
+            'message' => 'User already exists. Please login.',
+        ]);
+    } else {
+        // Save the new user
+        $insertQuery = "INSERT INTO FLUTTER_APP_USERS (MOBILE_NO, REGISTER_DATE) VALUES ('$contact', '$da')";
+        if (mysqli_query($conn, $insertQuery)) {
+            // Send OTP
+            $to = $contact;
+            $subject = "OTP: $randomdata";
+            $etxt = "Dear User, Please use the following OTP: $randomdata to complete your online request.";
+            $footer = "IAssist Team";
 
+            if (ctype_digit($to)) {
+                $session = createSession('', 'esmsusr_OsnbfGmX', 'mhirmBJj', '');
+                sendMessages($session, 'HAYLEYS SLR', $subject . "\n" . $etxt . "\n" . $footer, [$to], 1);
+                closeSession($session);
 
-$date = date( 'Y-m-d H:i:s' );
-
-
-if (ctype_digit($to)) {
-    
-    $session = createSession('', 'esmsusr_OsnbfGmX', 'mhirmBJj', '');
-    sendMessages($session, 'HAYLEYS SLR', $subject."\n".$etxt. "\n" . $footer, array($to), 1); 
-    closeSession($session);
-    echo "success" . ":" . $randomdata;
-     
-  
-} 
-         
-     }
-    
-    
-}else {
-    echo "0";
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'OTP sent successfully.',
+                    'otp' => $randomdata,
+                ]);
+            } else {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Invalid mobile number.',
+                ]);
+            }
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Failed to register user.',
+            ]);
+        }
+    }
+} else {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Mobile number not provided.',
+    ]);
 }
-    
-    ?>
-
-
-
-
-
-
+?>
