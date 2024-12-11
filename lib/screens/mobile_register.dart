@@ -77,15 +77,17 @@ class _MobileScreenState extends State<MobileScreen> {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                       decoration: InputDecoration(
+                        filled: true, // Enable fill color
+                        fillColor: Colors.white, // Set the fill color to white
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
+                          borderSide: BorderSide.none, // Remove border
                           borderRadius: BorderRadius.circular(10),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black12),
+                          borderSide: BorderSide.none, // Remove border
                           borderRadius: BorderRadius.circular(10),
                         ),
                         prefix: const Padding(
@@ -95,7 +97,8 @@ class _MobileScreenState extends State<MobileScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Color.fromARGB(255, 178, 5,
+                                  253), // Match text color to input field
                             ),
                           ),
                         ),
