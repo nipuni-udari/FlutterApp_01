@@ -43,7 +43,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 const SizedBox(height: 18),
                 Image.asset(
-                  'assets/images/illustration-2.png',
+                  'assets/images/illustration-3.png',
                   width: 200,
                   height: 200,
                   fit: BoxFit.cover,
