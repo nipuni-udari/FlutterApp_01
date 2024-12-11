@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class _OtpScreenState extends State<OtpScreen> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Container(
-          // Apply gradient background for the entire screen
+          // Gradient background for the entire screen
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -41,9 +42,8 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                // Directly display the image without a surrounding container or gradient
                 Image.asset(
-                  'assets/images/illustration-2.png',
+                  'assets/images/illustration-3.png',
                   width: 200,
                   height: 200,
                   fit: BoxFit.cover,
@@ -54,7 +54,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white, // Text color for contrast
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -63,7 +63,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white70, // Light text color
+                    color: Colors.white70,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -83,22 +83,57 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _textFieldOtpScreen(first: true, last: false),
-                          _textFieldOtpScreen(first: false, last: false),
-                          _textFieldOtpScreen(first: false, last: false),
-                          _textFieldOtpScreen(first: false, last: false),
-                          _textFieldOtpScreen(first: false, last: false),
-                          _textFieldOtpScreen(first: false, last: true),
-                        ],
+                      // Replace custom OTP TextFields with Pinput
+                      Pinput(
+                        length: 6,
+                        showCursor: true,
+                        defaultPinTheme: PinTheme(
+                          width: 50,
+                          height: 50,
+                          textStyle: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white),
+                          ),
+                        ),
+                        focusedPinTheme: PinTheme(
+                          width: 50,
+                          height: 50,
+                          textStyle: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color.fromARGB(255, 116, 86, 247),
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          // Handle PIN input changes
+                          print("OTP entered: $value");
+                        },
+                        onCompleted: (pin) {
+                          print("Completed OTP: $pin");
+                        },
                       ),
                       const SizedBox(height: 22),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Handle OTP verification
+                            print("Verify Button Pressed");
+                          },
                           style: ButtonStyle(
                             foregroundColor:
                                 MaterialStateProperty.all<Color>(Colors.white),
@@ -130,7 +165,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white70, // Light text color
+                    color: Colors.white70,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -145,51 +180,6 @@ class _OtpScreenState extends State<OtpScreen> {
                   textAlign: TextAlign.center,
                 ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _textFieldOtpScreen({required bool first, required bool last}) {
-    return SizedBox(
-      height: 85,
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: TextField(
-          autofocus: true,
-          onChanged: (value) {
-            if (value.length == 1 && !last) {
-              FocusScope.of(context).nextFocus();
-            }
-            if (value.isEmpty && !first) {
-              FocusScope.of(context).previousFocus();
-            }
-          },
-          showCursor: false,
-          readOnly: false,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white), // White text for OTP fields
-          keyboardType: TextInputType.number,
-          maxLength: 1,
-          decoration: InputDecoration(
-            counter: const Offstage(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(
-                  width: 2, color: Colors.white), // White border for OTP fields
-              borderRadius: BorderRadius.circular(12),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(
-                width: 2,
-                color: Color.fromARGB(
-                    255, 116, 86, 247), // Focus color for OTP fields
-              ),
-              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
