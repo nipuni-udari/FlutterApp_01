@@ -13,6 +13,12 @@ class MobileScreen extends StatefulWidget {
 class _MobileScreenState extends State<MobileScreen> {
   final TextEditingController _mobileController = TextEditingController();
   bool _isLoading = false;
+
+  // Constants for UI styling
+  static const Color primaryColor = Color(0xFF674AEF);
+  static const Color secondaryColor = Color.fromARGB(255, 11, 4, 43);
+  static const Color buttonColor = Color.fromARGB(255, 116, 86, 247);
+
   Future<void> sendOtp(String mobileNumber) async {
     setState(() {
       _isLoading = true;
@@ -21,45 +27,48 @@ class _MobileScreenState extends State<MobileScreen> {
     final url = Uri.parse(
         'http://192.168.93.141/FlutterProjects/newapp/lib/php/otp_sms.php'); // Replace with your API endpoint
     try {
-      final response = await http.post(url, body: {'contact': mobileNumber});
+      final response = await http.post(url, body: {'mobile': mobileNumber});
+
+      // Print the raw response for debugging
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Check if the response body is empty
-        if (response.body.isEmpty) {
-          _showAlert(
-              'Empty response from server. Please try again later.', null);
-          return;
-        }
+        try {
+          final data = jsonDecode(response.body);
 
-        // Parse the JSON
-        final data = jsonDecode(response.body);
-
-        if (data['status'] == '0') {
-          // User does not exist
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const OtpScreen(),
-          ));
-        } else if (data['status'] == 'exists') {
-          // User already exists
-          _showAlert(data['message'], () {
-            Navigator.of(context).pop(); // Close alert
-            Navigator.of(context)
-                .pushReplacementNamed('/login'); // Navigate to login
-          });
-        } else {
-          _showAlert('Unexpected response from server.', null);
+          switch (data['status']) {
+            case 'success':
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const OtpScreen(),
+              ));
+              break;
+            case 'exists':
+              _showAlert(data['message'], () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacementNamed('/login');
+              });
+              break;
+            case 'error':
+              _showAlert(data['message'], null);
+              break;
+            default:
+              _showAlert('Unexpected response from server.', null);
+          }
+        } catch (e) {
+          _showAlert('Failed to parse response: ${e.toString()}', null);
         }
       } else {
         _showAlert(
-            'Error: ${response.statusCode}. Please try again later.', null);
+            'HTTP Error: ${response.statusCode}. Please try again later.',
+            null);
       }
     } catch (e) {
-      _showAlert('An error occurred: $e', null);
+      _showAlert('An error occurred: ${e.toString()}', null);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _showAlert(String message, VoidCallback? onOkPressed) {
@@ -82,8 +91,8 @@ class _MobileScreenState extends State<MobileScreen> {
   }
 
   bool _isValidMobileNumber(String mobileNumber) {
-    // Check if the input is exactly 9 digits
-    final regex = RegExp(r'^\d{9}$');
+    // Matches valid Sri Lankan numbers with +94 or 0 prefixes and 9 digits after the prefix
+    final regex = RegExp(r'^(?:\+94|94|0)?[1-9]\d{8}$');
     return regex.hasMatch(mobileNumber);
   }
 
@@ -95,10 +104,7 @@ class _MobileScreenState extends State<MobileScreen> {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                const Color(0xFF674AEF),
-                const Color.fromARGB(255, 11, 4, 43),
-              ],
+              colors: [primaryColor, secondaryColor],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -165,22 +171,6 @@ class _MobileScreenState extends State<MobileScreen> {
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        prefix: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            '(+94)',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 178, 5, 253),
-                            ),
-                          ),
-                        ),
-                        suffixIcon: const Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 32,
-                        ),
                       ),
                     ),
                     const SizedBox(height: 22),
@@ -202,7 +192,7 @@ class _MobileScreenState extends State<MobileScreen> {
                           foregroundColor:
                               MaterialStateProperty.all<Color>(Colors.white),
                           backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color.fromARGB(255, 116, 86, 247),
+                            buttonColor,
                           ),
                           shape:
                               MaterialStateProperty.all<RoundedRectangleBorder>(

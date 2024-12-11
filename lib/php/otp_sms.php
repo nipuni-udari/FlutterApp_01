@@ -2,61 +2,64 @@
 
 ini_set('display_errors', 'on');
 include('connect.php');
-include('ESMSWS.php');
+include('./ESMSWS.php'); // Include SMS sending class
 
-$da = date('Y-m-d H:i:s');
-$randomdata = rand(10000, 99999);
+$randomOtp = rand(100000, 999999);
+$mobile = filter_input(INPUT_POST, 'mobile', FILTER_SANITIZE_NUMBER_INT); // Validate mobile number
 
-if (isset($_POST['contact'])) {
-    $contact = $_POST['contact'];
+if (!$mobile || !ctype_digit($mobile)) {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid mobile number.']);
+    exit;
+}
 
-    // Check if the user already exists
-    $query = "SELECT * FROM FLUTTER_APP_USERS WHERE MOBILE_NO = '$contact'";
-    $result = mysqli_query($conn, $query);
+// Check if the mobile number already exists
+$query = $conn->prepare("SELECT * FROM FLUTTER_APP_USERS WHERE MOBILE_NO = ?");
+$query->bind_param('s', $mobile);
+$query->execute();
+$result = $query->get_result();
 
-    if (mysqli_num_rows($result) > 0) {
-        // User already exists
-        echo json_encode([
-            'status' => 'exists',
-            'message' => 'User already exists. Please login.',
-        ]);
+if ($result->num_rows > 0) {
+    echo json_encode(['status' => 'exists', 'message' => 'User already exists. Please login.']);
+    exit;
+}
+
+// Save the new user
+$registerDate = date('Y-m-d H:i:s');
+$insertQuery = $conn->prepare("INSERT INTO FLUTTER_APP_USERS (MOBILE_NO, REGISTER_DATE) VALUES (?, ?)");
+$insertQuery->bind_param('ss', $mobile, $registerDate);
+
+if ($insertQuery->execute()) {
+    // Send OTP
+    $message = "Dear User, Please use the OTP $randomOtp to complete your registration.";
+    $footer = "Fentons";
+    $smsStatus = sendMSG("OTP Verification", $mobile, $message, $footer); // Send SMS OTP
+
+    // Check SMS status and return appropriate response
+    if ($smsStatus === 'SUCCESS') {
+        echo json_encode(['status' => 'success', 'message' => 'OTP sent successfully.']);
     } else {
-        // Save the new user
-        $insertQuery = "INSERT INTO FLUTTER_APP_USERS (MOBILE_NO, REGISTER_DATE) VALUES ('$contact', '$da')";
-        if (mysqli_query($conn, $insertQuery)) {
-            // Send OTP
-            $to = $contact;
-            $subject = "OTP: $randomdata";
-            $etxt = "Dear User, Please use the following OTP: $randomdata to complete your online request.";
-            $footer = "IAssist Team";
-
-            if (ctype_digit($to)) {
-                $session = createSession('', 'esmsusr_OsnbfGmX', 'mhirmBJj', '');
-                sendMessages($session, 'HAYLEYS SLR', $subject . "\n" . $etxt . "\n" . $footer, [$to], 1);
-                closeSession($session);
-
-                echo json_encode([
-                    'status' => 'success',
-                    'message' => 'OTP sent successfully.',
-                    'otp' => $randomdata,
-                ]);
-            } else {
-                echo json_encode([
-                    'status' => 'error',
-                    'message' => 'Invalid mobile number.',
-                ]);
-            }
-        } else {
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Failed to register user.',
-            ]);
-        }
+        echo json_encode(['status' => 'error', 'message' => 'Failed to send SMS']);
     }
 } else {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Mobile number not provided.',
-    ]);
+    echo json_encode(['status' => 'error', 'message' => 'Failed to register user.']);
+}
+
+// Function to send SMS using the external API
+function sendMSG($subject, $to, $etxt, $footer) {
+    $alias = "Fentons"; // Sender ID
+    $message = $etxt . " " . $footer;
+    $recipients = $to; // Recipient's phone number
+
+    // Initialize session with credentials
+    $session = createSession('', 'esmsusr_168l', '2pr8jmh', ''); // Replace with actual credentials
+    $messageType = 0; // Message type: 0 for normal message
+
+    // Send SMS via the gateway
+    $smsStatus = sendMessages($session, $alias, $message, $recipients, $messageType);
+
+
+
+    // Return the status of the SMS sending
+    return $smsStatus; // Return the SMS status (either SUCCESS or ERROR)
 }
 ?>
