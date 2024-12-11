@@ -34,12 +34,14 @@ if ($insertQuery->execute()) {
     $footer = "Fentons";
     $smsStatus = sendMSG("OTP Verification", $mobile, $message, $footer); // Send SMS OTP
 
+    
     // Check SMS status and return appropriate response
-    if ($smsStatus === 'SUCCESS') {
+    if ($smsStatus === 200) {
         echo json_encode(['status' => 'success', 'message' => 'OTP sent successfully.']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Failed to send SMS']);
     }
+    
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Failed to register user.']);
 }
