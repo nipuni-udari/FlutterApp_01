@@ -30,7 +30,7 @@ class _MobileScreenState extends State<MobileScreen> {
       final response = await http.post(url, body: {'mobile': mobileNumber});
 
       // Print the raw response for debugging
-      print('Response body: ${response.body}');
+      // print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         try {

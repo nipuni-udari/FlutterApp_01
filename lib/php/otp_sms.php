@@ -39,7 +39,7 @@ if ($insertQuery->execute()) {
     if ($smsStatus === 200) {
         echo json_encode(['status' => 'success', 'message' => 'OTP sent successfully.']);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to send SMS']);
+        echo json_encode(['status' => 'error', 'message' => 'Failed to send OTP']);
     }
     
 } else {
