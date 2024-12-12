@@ -1,21 +1,110 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
+import 'package:http/http.dart' as http;
 
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({Key? key}) : super(key: key);
+  final String mobileNumber;
+  final String otp; // Pass OTP generated on registration
+
+  const OtpScreen({Key? key, required this.mobileNumber, required this.otp})
+      : super(key: key);
 
   @override
   _OtpScreenState createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+  final TextEditingController _otpController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _verifyOtp() async {
+    final otp = _otpController.text;
+
+    if (otp.isEmpty) {
+      // Show an error if OTP is empty
+      _showErrorDialog('Please enter the OTP.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Send the OTP and mobile number to the backend
+    debugPrint(otp);
+    debugPrint(widget.mobileNumber);
+    final response = await http.post(
+      Uri.parse(
+          'http://192.168.93.141/FlutterProjects/newapp/lib/php/otp_verify.php'), // Replace with your PHP URL
+      body: {
+        'mobile': widget.mobileNumber,
+        'otp': otp,
+      },
+    );
+    debugPrint(response.body);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    final responseData = json.decode(response.body);
+
+    if (responseData['status'] == 'success') {
+      // Show success dialog and navigate to home screen
+      _showSuccessDialog();
+    } else {
+      // Show error dialog
+      _showErrorDialog(responseData['message']);
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Success'),
+          content: const Text('You have successfully registered.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/home');
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Container(
-          // Gradient background for the entire screen
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -37,7 +126,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     child: const Icon(
                       Icons.arrow_back,
                       size: 32,
-                      color: Colors.white, // Icon color for better contrast
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -83,8 +172,8 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                   child: Column(
                     children: [
-                      // Replace custom OTP TextFields with Pinput
                       Pinput(
+                        controller: _otpController,
                         length: 6,
                         showCursor: true,
                         defaultPinTheme: PinTheme(
@@ -119,21 +208,14 @@ class _OtpScreenState extends State<OtpScreen> {
                           ),
                         ),
                         onChanged: (value) {
-                          // Handle PIN input changes
-                          print("OTP entered: $value");
-                        },
-                        onCompleted: (pin) {
-                          print("Completed OTP: $pin");
+                          // Handle OTP input changes
                         },
                       ),
                       const SizedBox(height: 22),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Handle OTP verification
-                            print("Verify Button Pressed");
-                          },
+                          onPressed: _isLoading ? null : _verifyOtp,
                           style: ButtonStyle(
                             foregroundColor:
                                 MaterialStateProperty.all<Color>(Colors.white),
@@ -147,11 +229,11 @@ class _OtpScreenState extends State<OtpScreen> {
                               ),
                             ),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(14.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14.0),
                             child: Text(
-                              'Verify',
-                              style: TextStyle(fontSize: 16),
+                              _isLoading ? 'Verifying...' : 'Verify',
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ),
                         ),

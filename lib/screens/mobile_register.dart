@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'otp_screen.dart';
 
+//mobile screen
 class MobileScreen extends StatefulWidget {
   const MobileScreen({Key? key}) : super(key: key);
 
@@ -33,13 +34,17 @@ class _MobileScreenState extends State<MobileScreen> {
       // print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
+        debugPrint(mobileNumber);
         try {
           final data = jsonDecode(response.body);
 
           switch (data['status']) {
             case 'success':
               Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const OtpScreen(),
+                builder: (context) => OtpScreen(
+                  mobileNumber: mobileNumber,
+                  otp: '',
+                ),
               ));
               break;
             case 'exists':

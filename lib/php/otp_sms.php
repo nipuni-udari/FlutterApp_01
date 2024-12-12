@@ -25,8 +25,8 @@ if ($result->num_rows > 0) {
 
 // Save the new user
 $registerDate = date('Y-m-d H:i:s');
-$insertQuery = $conn->prepare("INSERT INTO FLUTTER_APP_USERS (MOBILE_NO, REGISTER_DATE) VALUES (?, ?)");
-$insertQuery->bind_param('ss', $mobile, $registerDate);
+$insertQuery = $conn->prepare("INSERT INTO FLUTTER_APP_USERS (MOBILE_NO, REGISTER_DATE, OTP) VALUES (?, ?, ?)");
+$insertQuery->bind_param('sss', $mobile, $registerDate, $randomOtp);
 
 if ($insertQuery->execute()) {
     // Send OTP

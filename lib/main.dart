@@ -27,7 +27,10 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupScreen(),
         '/home': (context) => HomeScreen(),
         '/mobile': (context) => MobileScreen(), // MobileScreen route
-        '/otp': (context) => OtpScreen(), // OtpScreen route
+        '/otp': (context) => OtpScreen(
+              mobileNumber: '',
+              otp: '',
+            ), // OtpScreen route
       },
     );
   }
