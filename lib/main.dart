@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/forgot_password_screen.dart';
+import 'package:newapp/screens/reset_password_screen.dart';
+import 'screens/reset_otp_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
@@ -26,11 +29,20 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/signup': (context) => SignupScreen(),
         '/home': (context) => HomeScreen(),
-        '/mobile': (context) => MobileScreen(), // MobileScreen route
+        '/mobile': (context) => MobileScreen(),
+        '/forgot_password': (context) => ForgotPasswordScreen(),
+        '/reset_Password': (context) => ResetPasswordScreen(
+              mobileNumber: '',
+              otp: '',
+            ),
         '/otp': (context) => OtpScreen(
               mobileNumber: '',
               otp: '',
-            ), // OtpScreen route
+            ),
+        '/reset_otp': (context) => ResetOtpScreen(
+              mobileNumber: '',
+              otp: '',
+            ),
       },
     );
   }

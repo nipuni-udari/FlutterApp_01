@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
+import 'package:newapp/screens/forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -267,9 +268,15 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ForgotPasswordScreen(),
+              ),
+            );
+          },
           child: Text(
-            "I forgot my password",
+            "forgot my password",
             style: TextStyle(color: myColor),
           ),
         ),
@@ -333,7 +340,7 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
       // debugPrint(response);
-      debugPrint(response.body);
+      //debugPrint(response.body);
       final data = json.decode(response.body);
 
       if (data['success']) {
