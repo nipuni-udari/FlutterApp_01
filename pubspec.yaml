@@ -37,10 +37,11 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  animate_do: ^3.3.4
+  animate_do: ^3.0.2
 
   awesome_snackbar_content: ^0.0.5
   pinput: ^5.0.0
+
 
 dev_dependencies:
   flutter_test:
@@ -78,9 +79,12 @@ flutter:
     - assets/images/twitter.png
     - assets/images/facebook.png
     - assets/images/google.png
+    - assets/images/reset_otp.png
     - assets/images/illustration-1.png
     - assets/images/illustration-2.png
-    - assets/images/illustration-3.png
+    - assets/images/reset_password.png
+    - assets/images/mobile_register.png
+    - assets/images/otp.png
 
 
 

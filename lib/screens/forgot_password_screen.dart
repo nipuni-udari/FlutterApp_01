@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:newapp/screens/reset_otp_screen.dart';
 import 'dart:convert';
+import 'package:animate_do/animate_do.dart'; // Import the animate_do package
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -79,7 +80,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   bool _isValidMobileNumber(String mobileNumber) {
-    final regex = RegExp(r'^(?:\+94|94|0)?[1-9]\d{8}$');
+    final regex = RegExp(r'^(?:\+94|94|0)?[0-9]{9}$');
     return regex.hasMatch(mobileNumber);
   }
 
@@ -112,91 +113,115 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                Image.asset(
-                  'assets/images/illustration-2.png',
-                  width: 200,
-                  height: 200,
+                FadeInDown(
+                  // Animation for the image
+                  child: Image.asset(
+                    'assets/images/illustration-2.png',
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Forgot Password',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                FadeInUp(
+                  // Animation for the title
+                  child: const Text(
+                    'Forgot Password',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "Enter your registered phone number. We'll send you a verification code to reset your password.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white70,
+                FadeInUp(
+                  // Animation for the description
+                  child: const Text(
+                    "Enter your registered phone number. We'll send you a verification code to reset your password.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 28),
                 Column(
                   children: [
-                    TextFormField(
-                      controller: _mobileController,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(10),
+                    FadeInUp(
+                      // Animation for the text field
+                      child: TextFormField(
+                        controller: _mobileController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(10),
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(
+                            Icons.phone,
+                            color: Colors.grey,
+                          ),
+                          hintText: 'Enter mobile number',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          filled: true,
+                          fillColor: Colors.white,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 22),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          final mobileNumber = _mobileController.text.trim();
-                          if (mobileNumber.isEmpty) {
-                            _showAlert('Please enter a mobile number.', null);
-                          } else if (!_isValidMobileNumber(mobileNumber)) {
-                            _showAlert(
-                                'Please enter a valid mobile number.', null);
-                          } else {
-                            sendOtp(mobileNumber);
-                          }
-                        },
-                        style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(buttonColor),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24.0),
+                    ZoomIn(
+                      // Animation for the button
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final mobileNumber = _mobileController.text.trim();
+                            if (mobileNumber.isEmpty) {
+                              _showAlert('Please enter a mobile number.', null);
+                            } else if (!_isValidMobileNumber(mobileNumber)) {
+                              _showAlert(
+                                  'Please enter a valid Sri Lankan mobile number.',
+                                  null);
+                            } else {
+                              sendOtp(mobileNumber);
+                            }
+                          },
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(buttonColor),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24.0),
+                              ),
                             ),
                           ),
-                        ),
-                        child: _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white)
-                            : const Padding(
-                                padding: EdgeInsets.all(14.0),
-                                child: Text(
-                                  'Send OTP',
+                          child: _isLoading
+                              ? const Text(
+                                  'Sending...',
                                   style: TextStyle(fontSize: 16),
+                                )
+                              : const Padding(
+                                  padding: EdgeInsets.all(14.0),
+                                  child: Text(
+                                    'Send OTP',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
                     ),
                   ],

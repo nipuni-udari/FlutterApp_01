@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:animate_do/animate_do.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String mobileNumber; // Pass mobile number from OTP screen
+  final String mobileNumber;
 
   const ResetPasswordScreen(
       {Key? key, required this.mobileNumber, required String otp})
@@ -18,6 +19,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool _isLoading = false;
+
+  bool _isNewPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   Future<void> _resetPassword() async {
     final newPassword = _newPasswordController.text;
@@ -37,10 +41,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       _isLoading = true;
     });
 
-    // Send new password and mobile number to backend
     final response = await http.post(
       Uri.parse(
-          'http://192.168.93.141/FlutterProjects/newapp/lib/php/reset_password.php'), // Replace with your PHP URL
+          'http://192.168.93.141/FlutterProjects/newapp/lib/php/reset_password.php'),
       body: {
         'mobile': widget.mobileNumber,
         'new_password': newPassword,
@@ -54,10 +57,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final responseData = json.decode(response.body);
 
     if (responseData['status'] == 'success') {
-      // Show success dialog and navigate to login screen
       _showSuccessDialog();
     } else {
-      // Show error dialog
       _showErrorDialog(responseData['message']);
     }
   }
@@ -72,9 +73,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close the dialog
-                Navigator.pushReplacementNamed(
-                    context, '/login'); // Navigate to login page
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/login');
               },
               child: const Text('OK'),
             ),
@@ -136,96 +136,161 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                Image.asset(
-                  'assets/images/illustration-3.png',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover,
+                BounceInDown(
+                  child: Image.asset(
+                    'assets/images/reset_password.png',
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Reset Password',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                FadeIn(
+                  duration: const Duration(milliseconds: 800),
+                  child: const Text(
+                    'Reset Password',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "Enter your new password",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white70,
+                FadeIn(
+                  duration: const Duration(milliseconds: 800),
+                  child: const Text(
+                    "Enter your new password",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 28),
-                Container(
-                  padding: const EdgeInsets.all(28),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF674AEF).withOpacity(0.7),
-                        const Color.fromARGB(255, 11, 4, 43).withOpacity(0.7),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                SlideInUp(
+                  duration: const Duration(milliseconds: 800),
+                  child: Container(
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF674AEF).withOpacity(0.7),
+                          const Color.fromARGB(255, 11, 4, 43).withOpacity(0.7),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: _newPasswordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'New Password',
-                          labelStyle: TextStyle(color: Colors.white),
-                          border: OutlineInputBorder(),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: _confirmPasswordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Confirm Password',
-                          labelStyle: TextStyle(color: Colors.white),
-                          border: OutlineInputBorder(),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 22),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _resetPassword,
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color.fromARGB(255, 116, 86, 247),
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: _newPasswordController,
+                          obscureText: !_isNewPasswordVisible,
+                          decoration: InputDecoration(
+                            prefixIcon:
+                                const Icon(Icons.lock, color: Colors.white),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isNewPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isNewPasswordVisible =
+                                      !_isNewPasswordVisible;
+                                });
+                              },
                             ),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24.0),
+                            labelText: 'New Password',
+                            labelStyle: const TextStyle(color: Colors.white),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.white70),
+                            ),
+                          ),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: _confirmPasswordController,
+                          obscureText: !_isConfirmPasswordVisible,
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.lock_outline,
+                                color: Colors.white),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isConfirmPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isConfirmPasswordVisible =
+                                      !_isConfirmPasswordVisible;
+                                });
+                              },
+                            ),
+                            labelText: 'Confirm Password',
+                            labelStyle: const TextStyle(color: Colors.white),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.white70),
+                            ),
+                          ),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: 22),
+                        ZoomIn(
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _resetPassword,
+                              style: ButtonStyle(
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                  const Color.fromARGB(255, 116, 86, 247),
+                                ),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24.0),
+                                  ),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: Text(
+                                  _isLoading
+                                      ? 'Resetting...'
+                                      : 'Reset Password',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
                               ),
                             ),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Text(
-                              _isLoading ? 'Resetting...' : 'Reset Password',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ],

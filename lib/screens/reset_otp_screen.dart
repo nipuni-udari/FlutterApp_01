@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pinput/pinput.dart';
+import 'package:animate_do/animate_do.dart'; // Import animate_do package
 import 'reset_password_screen.dart';
 
 class ResetOtpScreen extends StatefulWidget {
@@ -112,123 +113,135 @@ class _ResetOtpScreenState extends State<ResetOtpScreen> {
                 ),
                 const SizedBox(height: 18),
 
-                // Illustration
-                Image.asset(
-                  'assets/images/illustration-3.png',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover,
+                // Illustration with Animation
+                BounceInDown(
+                  duration: const Duration(milliseconds: 1200),
+                  child: Image.asset(
+                    'assets/images/reset_otp.png',
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 const SizedBox(height: 24),
 
-                // Title
-                const Text(
-                  'OTP Verification',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                // Title with Animation
+                FadeIn(
+                  duration: const Duration(milliseconds: 1000),
+                  child: const Text(
+                    'OTP Verification',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
 
-                // Subtitle
-                const Text(
-                  "Enter the OTP sent to your registered mobile number",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white70,
+                // Subtitle with Animation
+                FadeIn(
+                  duration: const Duration(milliseconds: 1200),
+                  child: const Text(
+                    "Enter the OTP sent to your registered mobile number",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 28),
 
-                // OTP Input Section
-                Container(
-                  padding: const EdgeInsets.all(28),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF674AEF).withOpacity(0.7),
-                        const Color.fromARGB(255, 11, 4, 43).withOpacity(0.7),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      // Pinput for OTP
-                      Pinput(
-                        controller: _otpController,
-                        length: 6,
-                        showCursor: true,
-                        defaultPinTheme: PinTheme(
-                          width: 50,
-                          height: 50,
-                          textStyle: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.white),
-                          ),
-                        ),
-                        focusedPinTheme: PinTheme(
-                          width: 50,
-                          height: 50,
-                          textStyle: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: const Color.fromARGB(255, 116, 86, 247),
-                              width: 2,
-                            ),
-                          ),
-                        ),
+                // OTP Input Section with Animation
+                SlideInUp(
+                  duration: const Duration(milliseconds: 1400),
+                  child: Container(
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF674AEF).withOpacity(0.7),
+                          const Color.fromARGB(255, 11, 4, 43).withOpacity(0.7),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      const SizedBox(height: 22),
-
-                      // Verify Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : () => verifyOTP(_otpController.text.trim()),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                              const Color.fromARGB(255, 116, 86, 247),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        // Pinput for OTP
+                        Pinput(
+                          controller: _otpController,
+                          length: 6,
+                          showCursor: true,
+                          defaultPinTheme: PinTheme(
+                            width: 50,
+                            height: 50,
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
-                            foregroundColor:
-                                MaterialStateProperty.all(Colors.white),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24.0),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.white),
+                            ),
+                          ),
+                          focusedPinTheme: PinTheme(
+                            width: 50,
+                            height: 50,
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color.fromARGB(255, 116, 86, 247),
+                                width: 2,
                               ),
                             ),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Text(
-                              _isLoading ? 'Verifying...' : 'Verify OTP',
-                              style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 22),
+
+                        // Verify Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => verifyOTP(_otpController.text.trim()),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                const Color.fromARGB(255, 116, 86, 247),
+                              ),
+                              foregroundColor:
+                                  MaterialStateProperty.all(Colors.white),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24.0),
+                                ),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14.0),
+                              child: Text(
+                                _isLoading ? 'Verifying...' : 'Verify OTP',
+                                style: const TextStyle(fontSize: 16),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 18),

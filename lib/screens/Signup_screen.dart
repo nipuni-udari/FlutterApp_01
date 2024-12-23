@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  final String mobileNumber;
+
+  const SignupScreen({super.key, required this.mobileNumber});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -15,7 +17,7 @@ class _SignupScreenState extends State<SignupScreen> {
   late Size mediaSize;
   late bool isLandscape;
   TextEditingController usernameController = TextEditingController();
-  TextEditingController mobileController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -30,38 +32,19 @@ class _SignupScreenState extends State<SignupScreen> {
     return emailRegex.hasMatch(email);
   }
 
-  // Function to validate phone number
-  bool _isValidPhone(String phone) {
-    return phone.length == 10 && int.tryParse(phone) != null;
-  }
-
   // Function to handle sign-up
   Future<void> _signUp() async {
     // Validate input fields
     if (usernameController.text.isEmpty ||
         passwordController.text.isEmpty ||
         emailController.text.isEmpty ||
-        mobileController.text.isEmpty) {
-      setState(() {
-        errorMessage = "Please fill in all fields.";
-        successMessage = ""; // Clear success message
-      });
+        addressController.text.isEmpty) {
+      _showErrorDialog("Please fill in all fields.");
       return;
     }
 
     if (!_isValidEmail(emailController.text)) {
-      setState(() {
-        errorMessage = "Please enter a valid email address.";
-        successMessage = ""; // Clear success message
-      });
-      return;
-    }
-
-    if (!_isValidPhone(mobileController.text)) {
-      setState(() {
-        errorMessage = "Please enter a valid 10-digit phone number.";
-        successMessage = ""; // Clear success message
-      });
+      _showErrorDialog("Please enter a valid email address.");
       return;
     }
 
@@ -81,7 +64,7 @@ class _SignupScreenState extends State<SignupScreen> {
           'USERNAME': usernameController.text,
           'PASSWORD': passwordController.text,
           'EMAIL': emailController.text,
-          'MOBILE_NO': mobileController.text,
+          'USER_ADDRESS': addressController.text,
         },
       );
 
@@ -126,6 +109,25 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  // Function to show error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("Error"),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     myColor = Color(0xFF674AEF);
@@ -146,6 +148,67 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: const Color.fromARGB(0, 174, 22, 245),
         body: Stack(
           children: [
+            // Animated background elements
+            Positioned(
+              left: 30,
+              width: 80,
+              height: 200,
+              child: FadeInUp(
+                duration: const Duration(seconds: 1),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/light-1.png'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 140,
+              width: 80,
+              height: 150,
+              child: FadeInUp(
+                duration: const Duration(milliseconds: 1200),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/light-2.png'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              right: 40,
+              top: 40,
+              width: 80,
+              height: 150,
+              child: FadeInUp(
+                duration: const Duration(milliseconds: 1300),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/clock.png'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Back Button
+            Positioned(
+              top: 40,
+              left: 20,
+              child: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+              ),
+            ),
+
+            // Main content
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -159,8 +222,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.all(
-                          isLandscape ? 12 : 20), // Reduced padding
+                      padding: EdgeInsets.all(isLandscape ? 12 : 20),
                       child: _buildBottom(),
                     ),
                   ),
@@ -213,16 +275,6 @@ class _SignupScreenState extends State<SignupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Display error message
-        if (errorMessage.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10.0),
-            child: Text(
-              errorMessage,
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            ),
-          ),
-
         // Display success message
         if (successMessage.isNotEmpty)
           Padding(
@@ -256,17 +308,16 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         FadeInUp(
           duration: const Duration(milliseconds: 2100),
-          child: _buildInputField(usernameController),
+          child: _buildInputField(usernameController, icon: Icons.person),
         ),
         const SizedBox(height: 20),
         FadeInUp(
           duration: const Duration(milliseconds: 2000),
-          child: _buildGreyText("Mobile"),
+          child: _buildGreyText("Address"),
         ),
         FadeInUp(
           duration: const Duration(milliseconds: 2100),
-          child: _buildInputField(mobileController,
-              keyboardType: TextInputType.phone),
+          child: _buildInputField(addressController, icon: Icons.home),
         ),
         const SizedBox(height: 20),
         FadeInUp(
@@ -275,7 +326,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         FadeInUp(
           duration: const Duration(milliseconds: 2300),
-          child: _buildInputField(emailController),
+          child: _buildInputField(emailController, icon: Icons.email),
         ),
         const SizedBox(height: 20),
         FadeInUp(
@@ -284,7 +335,8 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         FadeInUp(
           duration: const Duration(milliseconds: 2500),
-          child: _buildInputField(passwordController, isPassword: true),
+          child: _buildInputField(passwordController,
+              isPassword: true, icon: Icons.lock),
         ),
         const SizedBox(height: 10),
         FadeInUp(
@@ -311,10 +363,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _buildInputField(TextEditingController controller,
       {bool isPassword = false,
-      TextInputType keyboardType = TextInputType.text}) {
+      TextInputType keyboardType = TextInputType.text,
+      IconData? icon}) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
+        prefixIcon: icon != null ? Icon(icon) : null,
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
@@ -326,7 +380,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   });
                 },
               )
-            : Icon(Icons.done),
+            : null,
       ),
       obscureText: isPassword ? !_isPasswordVisible : false,
       keyboardType: keyboardType,
@@ -354,20 +408,14 @@ class _SignupScreenState extends State<SignupScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Do you have an account? ",
-            style: TextStyle(color: Colors.grey)),
-        TextButton(
-          onPressed: () {
-            // Navigate to the sign-in screen (you should define this route)
+        const Text("Already have an account? "),
+        GestureDetector(
+          onTap: () {
             Navigator.pushReplacementNamed(context, '/login');
           },
           child: Text(
             "Sign In",
-            style: TextStyle(
-              color: myColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: myColor, fontWeight: FontWeight.bold),
           ),
         ),
       ],

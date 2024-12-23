@@ -19,7 +19,7 @@ $query->execute();
 $result = $query->get_result();
 
 if ($result->num_rows > 0) {
-    echo json_encode(['status' => 'exists', 'message' => 'User already exists. Please login.']);
+    echo json_encode(['status' => 'exists', 'message' => 'You are already registered. Please proceed to log in.']);
     exit;
 }
 

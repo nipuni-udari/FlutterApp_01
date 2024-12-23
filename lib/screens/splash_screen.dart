@@ -9,10 +9,33 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
+
   @override
   void initState() {
     super.initState();
+
+    // Initialize the animation controller
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    // Define the forward motion animation with a curve for the logo
+    _animation = Tween<Offset>(
+      begin: Offset(0.0, 0.0),
+      end: Offset(0.0, -0.2), // Adjust this value for the desired motion
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut, // You can change the curve for different effects
+    ));
+
+    // Start the animation
+    _controller.forward();
+
     // Simulate a delay for the splash screen (e.g., 3 seconds)
     Future.delayed(const Duration(seconds: 3), () {
       // Navigate to the WelcomeScreen after the delay
@@ -21,6 +44,12 @@ class _SplashScreenState extends State<SplashScreen> {
         MaterialPageRoute(builder: (context) => WelcomeScreen()),
       );
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -38,24 +67,29 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         child: Center(
-          child: AnimatedOpacity(
-            opacity: 1.0,
-            duration: const Duration(seconds: 2),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset('assets/images/logo.png', width: 200, height: 200),
-                const SizedBox(height: 20),
-                const Text(
-                  'Welcome to Your App',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return SlideTransition(
+                    position: _animation,
+                    child: Image.asset('assets/images/logo.png',
+                        width: 200, height: 200),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Welcome to Your App',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -9,11 +9,11 @@ include('connect.php');
 // print_r($_POST);
 
 
-$user_email = mysqli_real_escape_string($conn, $_POST['email']);
+$user_mobile = mysqli_real_escape_string($conn, $_POST['mobile']);
 $user_password = mysqli_real_escape_string($conn, $_POST['password']);
 
 
-$sql_check = "SELECT * FROM FLUTTER_APP_USERS WHERE EMAIL = '$user_email'";
+$sql_check = "SELECT * FROM FLUTTER_APP_USERS WHERE MOBILE_NO = '$user_mobile'";
 $result = mysqli_query($conn, $sql_check);
 
 if ($result && mysqli_num_rows($result) > 0) {
@@ -24,12 +24,12 @@ if ($result && mysqli_num_rows($result) > 0) {
         echo json_encode(["success" => true, "message" => "Login successful."]);
     } else {
        
-        echo json_encode(["success" => false, "message" => "Invalid email or password."]);
+        echo json_encode(["success" => false, "message" => "Invalid mobile or password."]);
     }
 } else {
 
-    echo json_encode(["failed" => false, "message" => "Email not found."]);
-    // echo json_encode($user_email);
+    echo json_encode(["failed" => false, "message" => "mobile not found."]);
+    // echo json_encode($user_mobile);
 }
 
 mysqli_close($conn);

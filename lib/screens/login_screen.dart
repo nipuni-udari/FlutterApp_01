@@ -14,16 +14,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late Color myColor;
   late Size mediaSize;
-  TextEditingController emailController = TextEditingController();
+  TextEditingController mobileController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool rememberUser = false;
   bool isLoading = false;
-  String errorMessage = '';
   bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    myColor = Color(0xFF674AEF);
+    myColor = const Color(0xFF674AEF);
     mediaSize = MediaQuery.of(context).size;
 
     return Container(
@@ -40,6 +39,19 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: const Color.fromARGB(0, 174, 22, 245),
         body: Stack(
           children: [
+            // Back Button
+            Positioned(
+              top: 40,
+              left: 10,
+              child: IconButton(
+                icon:
+                    const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/welcome');
+                },
+              ),
+            ),
+            // Animated Background Elements
             Positioned(
               left: 30,
               width: 80,
@@ -102,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.all(32.0),
                       child: Column(
                         children: [
-                          // Remove this error display to avoid duplication
                           _buildBottom(),
                         ],
                       ),
@@ -157,19 +168,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Display error message only once before "Welcome Back" text
-        if (errorMessage.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Text(
-              errorMessage,
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
         FadeInUp(
           duration: const Duration(milliseconds: 1800),
           child: Text(
@@ -184,14 +182,13 @@ class _LoginScreenState extends State<LoginScreen> {
           child: _buildGreyText("Please log in to your account"),
         ),
         const SizedBox(height: 20),
-        const SizedBox(height: 20),
         FadeInUp(
           duration: const Duration(milliseconds: 2100),
-          child: _buildGreyText("Email address"),
+          child: _buildGreyText("Mobile Number"),
         ),
         FadeInUp(
           duration: const Duration(milliseconds: 2200),
-          child: _buildInputField(emailController),
+          child: _buildInputField(mobileController),
         ),
         const SizedBox(height: 40),
         FadeInUp(
@@ -233,6 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
       {isPassword = false}) {
     return TextField(
       controller: controller,
+      keyboardType: isPassword ? TextInputType.text : TextInputType.phone,
       decoration: InputDecoration(
         suffixIcon: isPassword
             ? IconButton(
@@ -245,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   });
                 },
               )
-            : Icon(Icons.done),
+            : const Icon(Icons.done),
       ),
       obscureText: isPassword ? !_isPasswordVisible : false,
     );
@@ -287,27 +285,18 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoginButton() {
     return ElevatedButton(
       onPressed: () async {
-        // Dismiss the keyboard when login button is pressed
         FocusScope.of(context).unfocus();
 
-        // Check if email and password are not empty
-        if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-          setState(() {
-            errorMessage = "Please enter both email and password.";
-          });
+        if (mobileController.text.isEmpty || passwordController.text.isEmpty) {
+          _showAlert("Error", "Please enter both mobile and password.");
           return;
         }
 
-        // Start loading
         setState(() {
           isLoading = true;
-          errorMessage = ''; // Reset error message on login attempt
         });
-
-        // Perform login
         await _login();
 
-        // Stop loading
         setState(() {
           isLoading = false;
         });
@@ -317,12 +306,18 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 20,
         shadowColor: myColor,
         minimumSize: const Size.fromHeight(60),
-        backgroundColor: Color.fromARGB(255, 116, 86, 247),
+        backgroundColor: const Color.fromARGB(255, 116, 86, 247),
         foregroundColor: Colors.white,
       ),
       child: isLoading
-          ? CircularProgressIndicator(color: Colors.white)
-          : Text(
+          ? FadeInUp(
+              duration: const Duration(milliseconds: 1500),
+              child: const Text(
+                'Logging in...',
+                style: TextStyle(fontSize: 20),
+              ),
+            )
+          : const Text(
               'Login',
               style: TextStyle(fontSize: 20),
             ),
@@ -335,56 +330,71 @@ class _LoginScreenState extends State<LoginScreen> {
         Uri.parse(
             'http://192.168.93.141/FlutterProjects/newapp/lib/php/login.php'),
         body: {
-          'email': emailController.text,
+          'mobile': mobileController.text,
           'password': passwordController.text,
         },
       );
-      // debugPrint(response);
-      //debugPrint(response.body);
-      final data = json.decode(response.body);
 
-      if (data['success']) {
-        Navigator.pushReplacementNamed(context, '/home');
-      } else if (data['message'] == 'User does not exist') {
-        setState(() {
-          errorMessage = 'User does not exist. Please check your email.';
-        });
-      } else if (data['message'] == 'Incorrect password') {
-        setState(() {
-          errorMessage = 'Incorrect password. Please try again.';
-        });
+      // Check for successful response
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['success']) {
+          Navigator.pushReplacementNamed(context, '/home');
+        } else if (data['message'] == 'User does not exist') {
+          _showAlert("Login Failed", "Invalid credentials. Please try again.");
+        } else {
+          _showAlert(
+              "Login Failed", "An unknown error occurred. Please try again.");
+        }
       } else {
-        setState(() {
-          errorMessage = 'An error occurred. Please try again laterr.';
-        });
+        _showAlert("Error", "Server error. Please try again later.");
       }
-    } catch (error) {
-      setState(() {
-        errorMessage = 'An error occurred. Please try again later.';
-      });
+    } catch (e) {
+      _showAlert("Error", "Unable to connect to the server.");
     }
   }
 
-  Widget _buildSignUpOption() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text("Don't have an account? ",
-            style: TextStyle(color: Colors.grey)),
-        TextButton(
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/mobile');
-          },
-          child: Text(
-            "Sign Up",
-            style: TextStyle(
-              color: myColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+  void _showAlert(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("OK"),
             ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildSignUpOption() {
+    return Center(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/signup');
+        },
+        child: RichText(
+          text: TextSpan(
+            text: "Don't have an account? ",
+            style: const TextStyle(color: Colors.grey),
+            children: [
+              TextSpan(
+                text: "Sign up",
+                style: TextStyle(
+                    color: myColor, fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
