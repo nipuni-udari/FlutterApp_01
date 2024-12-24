@@ -27,7 +27,9 @@ class MyApp extends StatelessWidget {
         '/': (context) => SplashScreen(),
         '/welcome': (context) => WelcomeScreen(),
         '/login': (context) => LoginScreen(),
-        '/signup': (context) => SignupScreen(),
+        '/signup': (context) => SignupScreen(
+              mobileNumber: '',
+            ),
         '/home': (context) => HomeScreen(),
         '/mobile': (context) => MobileScreen(),
         '/forgot_password': (context) => ForgotPasswordScreen(),

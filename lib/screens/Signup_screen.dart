@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class SignupScreen extends StatefulWidget {
   final String mobileNumber;
 
-  const SignupScreen({super.key, required this.mobileNumber});
+  const SignupScreen({Key? key, required this.mobileNumber}) : super(key: key);
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -35,6 +35,7 @@ class _SignupScreenState extends State<SignupScreen> {
   // Function to handle sign-up
   Future<void> _signUp() async {
     // Validate input fields
+    print("Mobile Number: ${widget.mobileNumber}");
     if (usernameController.text.isEmpty ||
         passwordController.text.isEmpty ||
         emailController.text.isEmpty ||
@@ -65,8 +66,10 @@ class _SignupScreenState extends State<SignupScreen> {
           'PASSWORD': passwordController.text,
           'EMAIL': emailController.text,
           'USER_ADDRESS': addressController.text,
+          'mobile': widget.mobileNumber,
         },
       );
+      print("Mobile Number: ${widget.mobileNumber}");
 
       // Check if the response status is 200 (OK)
       if (response.statusCode == 200) {

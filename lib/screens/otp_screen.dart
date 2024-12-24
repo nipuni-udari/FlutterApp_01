@@ -64,6 +64,9 @@ class _OtpScreenState extends State<OtpScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                // Print the mobile number before navigating
+                print(
+                    'Navigating to /signup with mobile: ${widget.mobileNumber}');
                 Navigator.pushReplacementNamed(
                   context,
                   '/signup',
