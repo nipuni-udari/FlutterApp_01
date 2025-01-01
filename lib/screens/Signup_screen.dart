@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:newapp/screens/login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   final String mobileNumber;
@@ -70,28 +71,38 @@ class _SignupScreenState extends State<SignupScreen> {
         },
       );
       print("Mobile Number: ${widget.mobileNumber}");
-
+      print(response.statusCode);
       // Check if the response status is 200 (OK)
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-
-        setState(() {
-          isLoading = false; // Hide loading indicator
-        });
-
-        if (responseData['success']) {
-          setState(() {
-            successMessage = "Registration Successful!";
-            errorMessage = ""; // Clear error messages
-          });
-          // Navigate to the login screen
-          Navigator.pushReplacementNamed(context, '/login');
-        } else {
-          setState(() {
-            errorMessage =
-                responseData['message'] ?? "Username already exists.";
-            successMessage = ""; // Clear success message
-          });
+        final data = jsonDecode(response.body);
+        print(data['status']);
+        switch (data['status']) {
+          case 'emailExist' || 'userNameExist':
+            _showAlert(data['message'], () {
+              setState(() {
+                isLoading = false;
+              });
+            });
+            break;
+          case 'email&UserNameExist':
+            _showAlert(data['message'], () {
+              setState(() {
+                isLoading = false;
+              });
+            });
+            break;
+          case 'success':
+            _showAlert(data['message'], () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => LoginScreen(),
+              ));
+            });
+            break;
+          case 'error':
+            _showAlert(data['message'], null);
+            break;
+          default:
+            _showAlert('Unexpected response from server.', null);
         }
       } else {
         // If the status code is not 200, show a generic error message
@@ -125,6 +136,25 @@ class _SignupScreenState extends State<SignupScreen> {
               Navigator.of(ctx).pop();
             },
             child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAlert(String message, VoidCallback? onOkPressed) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Alert'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (onOkPressed != null) onOkPressed();
+            },
+            child: const Text('OK'),
           ),
         ],
       ),

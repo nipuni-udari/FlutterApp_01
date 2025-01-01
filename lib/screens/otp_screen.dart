@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/Signup_screen.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
 import 'package:animate_do/animate_do.dart'; // Import the animate_do package
@@ -67,11 +68,15 @@ class _OtpScreenState extends State<OtpScreen> {
                 // Print the mobile number before navigating
                 print(
                     'Navigating to /signup with mobile: ${widget.mobileNumber}');
-                Navigator.pushReplacementNamed(
-                  context,
-                  '/signup',
-                  arguments: {'mobile': widget.mobileNumber},
-                );
+                // Navigator.pushReplacementNamed(
+                //   context,
+                //   '/signup',
+                //   arguments: {'mobile': widget.mobileNumber},
+                // );
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      SignupScreen(mobileNumber: widget.mobileNumber),
+                ));
               },
               child: const Text('OK'),
             ),

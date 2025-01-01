@@ -19,9 +19,19 @@ $query->execute();
 $result = $query->get_result();
 
 if ($result->num_rows > 0) {
-    echo json_encode(['status' => 'exists', 'message' => 'You are already registered. Please proceed to log in.']);
+    $row = $result->fetch_assoc();
+
+    if (!empty($row['MOBILE_NO']) && (empty($row['USERNAME']) || empty($row['EMAIL']))) {
+        echo json_encode(['status' => 'onlyMobileExists', 'message' => 'Mobile number is registered. Please complete your registration.']);
+    } else {
+        echo json_encode(['status' => 'exists', 'message' => 'You are already registered. Please proceed to log in.']);
+    } 
+    // else {
+    //     echo json_encode(['status' => 'partial', 'message' => 'Partial registration found. Please complete your profile.']);
+    // }
     exit;
 }
+
 
 // Save the new user
 $registerDate = date('Y-m-d H:i:s');

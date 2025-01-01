@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:newapp/screens/Signup_screen.dart';
 import 'dart:convert';
 import 'otp_screen.dart';
 import 'package:animate_do/animate_do.dart'; // Import animate_do
@@ -41,6 +42,13 @@ class _MobileScreenState extends State<MobileScreen>
                 otp: '',
               ),
             ));
+            break;
+          case 'onlyMobileExists':
+            _showAlert(data['message'], () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => SignupScreen(mobileNumber: mobileNumber),
+              ));
+            });
             break;
           case 'exists':
             _showAlert(data['message'], () {
