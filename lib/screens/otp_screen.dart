@@ -34,7 +34,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
     final response = await http.post(
       Uri.parse(
-          'http://192.168.93.141/FlutterProjects/newapp/lib/php/otp_verify.php'),
+          'https://demo.secretary.lk/electronics_mobile_app/backend/otp_verify.php'),
       body: {
         'mobile': widget.mobileNumber,
         'otp': otp,

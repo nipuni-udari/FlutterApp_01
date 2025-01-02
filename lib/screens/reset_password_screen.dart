@@ -43,7 +43,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     final response = await http.post(
       Uri.parse(
-          'http://192.168.93.141/FlutterProjects/newapp/lib/php/reset_password.php'),
+          'https://demo.secretary.lk/electronics_mobile_app/backend/reset_password.php'),
       body: {
         'mobile': widget.mobileNumber,
         'new_password': newPassword,

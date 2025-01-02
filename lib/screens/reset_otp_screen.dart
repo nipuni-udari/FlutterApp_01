@@ -31,7 +31,7 @@ class _ResetOtpScreenState extends State<ResetOtpScreen> {
     });
 
     final url = Uri.parse(
-        'http://192.168.93.141/FlutterProjects/newapp/lib/php/reset_otp_sms.php');
+        'https://demo.secretary.lk/electronics_mobile_app/backend/reset_otp_sms.php');
     try {
       final response = await http.post(url, body: {
         'mobile': widget.mobileNumber,

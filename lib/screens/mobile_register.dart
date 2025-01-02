@@ -28,7 +28,8 @@ class _MobileScreenState extends State<MobileScreen>
     });
 
     final url = Uri.parse(
-        'http://192.168.93.141/FlutterProjects/newapp/lib/php/otp_sms.php');
+        'https://demo.secretary.lk/electronics_mobile_app/backend/otp_sms.php');
+
     try {
       final response = await http.post(url, body: {'mobile': mobileNumber});
 

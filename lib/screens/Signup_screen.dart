@@ -57,8 +57,7 @@ class _SignupScreenState extends State<SignupScreen> {
     });
 
     final String url =
-        'http://192.168.93.141/FlutterProjects/newapp/lib/php/signup.php'; // Replace with your actual server URL
-
+        'https://demo.secretary.lk/electronics_mobile_app/backend/signup.php'; // Replace with your actual server URL
     try {
       final response = await http.post(
         Uri.parse(url),

@@ -328,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://192.168.93.141/FlutterProjects/newapp/lib/php/login.php'),
+            'https://demo.secretary.lk/electronics_mobile_app/backend/login.php'),
         body: {
           'mobile': mobileController.text,
           'password': passwordController.text,

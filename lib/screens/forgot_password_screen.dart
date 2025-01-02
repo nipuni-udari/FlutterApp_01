@@ -25,7 +25,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
 
     final url = Uri.parse(
-        'http://192.168.93.141/FlutterProjects/newapp/lib/php/forgot_password.php'); // Replace with your API endpoint
+        ' https://demo.secretary.lk/electronics_mobile_app/backend/forgot_password.php ');
+
     try {
       final response = await http.post(url, body: {'mobile': mobileNumber});
 
