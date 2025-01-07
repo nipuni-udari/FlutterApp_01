@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/Inquries/inquries_screen.dart';
 import 'package:newapp/screens/forgot_password_screen.dart';
 import 'package:newapp/screens/reset_password_screen.dart';
 import 'screens/reset_otp_screen.dart';
@@ -9,6 +10,7 @@ import 'screens/signup_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/mobile_register.dart';
 import 'screens/otp_screen.dart';
+import 'screens/Inquries/inquries_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,6 +34,7 @@ class MyApp extends StatelessWidget {
             ),
         '/home': (context) => HomeScreen(),
         '/mobile': (context) => MobileScreen(),
+        '/inquries': (context) => InquriesScreen(),
         '/forgot_password': (context) => ForgotPasswordScreen(),
         '/reset_Password': (context) => ResetPasswordScreen(
               mobileNumber: '',
