@@ -17,6 +17,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
   String? selectedCustomer;
   TextEditingController quantityController = TextEditingController();
   TextEditingController amountController = TextEditingController();
+  List<Map<String, dynamic>> addedProducts = [];
 
   @override
   void initState() {
@@ -89,6 +90,32 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
     }
   }
 
+  void addProductToList() {
+    setState(() {
+      final selectedCustomerData = customerList.firstWhere(
+        (customer) => customer.contains(selectedCustomer as Pattern),
+        orElse: () => '',
+      );
+
+      final customerName =
+          selectedCustomerData.split(' - ')[1]; // Extract customer name
+
+      final selectedProductData = productList.firstWhere(
+        (product) => product['id'].toString() == selectedProduct,
+        orElse: () => {'name': 'Unknown Product'},
+      );
+
+      final productName = selectedProductData['name']; // Extract product name
+
+      addedProducts.add({
+        'customer_company_name': customerName,
+        'product_name': productName,
+        'product_qty': quantityController.text,
+        'total_value': amountController.text,
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -108,12 +135,12 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
               children: [
                 _buildSectionTitle('Customer Information'),
                 Autocomplete<String>(
+                  // Customer Autocomplete
                   optionsBuilder: (TextEditingValue textEditingValue) {
                     if (textEditingValue.text.isEmpty) {
                       return const Iterable<String>.empty();
                     }
 
-                    // Check if the customer list contains the input text
                     final matchingCustomers =
                         customerList.where((String customer) {
                       return customer
@@ -121,26 +148,20 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                           .contains(textEditingValue.text.toLowerCase());
                     }).toList();
 
-                    // If no matching customers, call fetchCustomerData
                     if (matchingCustomers.isEmpty) {
                       fetchCustomerData(searchInput: textEditingValue.text);
-                      print('Selected Customer: $customerList');
                     }
 
                     return matchingCustomers;
                   },
                   onSelected: (String selectedCustomer) {
                     setState(() {
-                      // Find the customer ID based on the selected customer name
-
                       final selectedCustomerData = customerList.firstWhere(
                         (customer) => customer.contains(selectedCustomer),
                         orElse: () => '',
                       );
-
-                      final customerId = selectedCustomerData.split(' - ')[
-                          0]; // Modify this logic based on your actual customer data format
-                      this.selectedCustomer = customerId;
+                      this.selectedCustomer =
+                          selectedCustomerData.split(' - ')[0];
                     });
                   },
                   fieldViewBuilder:
@@ -160,19 +181,16 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                 const SizedBox(height: 16),
                 _buildSectionTitle('Product Description'),
                 DropdownButtonFormField<String>(
-                  value:
-                      selectedProduct, // This will hold the selected product's ID
+                  value: selectedProduct,
                   items: productList.map((product) {
                     return DropdownMenuItem<String>(
-                      value: product['id']
-                          .toString(), // Store the product ID as value
-                      child: Text(product['name']), // Display the product name
+                      value: product['id'].toString(),
+                      child: Text(product['name']),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
-                      selectedProduct =
-                          newValue; // Update selected product's ID
+                      selectedProduct = newValue;
                     });
                   },
                   decoration: const InputDecoration(
@@ -209,6 +227,30 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: addProductToList,
+                  child: const Text('Add Product'),
+                ),
+                const SizedBox(height: 16),
+                _buildSectionTitle('Product List'),
+                if (addedProducts.isNotEmpty)
+                  DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Customer')),
+                      DataColumn(label: Text('Product')),
+                      DataColumn(label: Text('Quantity')),
+                      DataColumn(label: Text('Total Value')),
+                    ],
+                    rows: addedProducts.map((product) {
+                      return DataRow(cells: [
+                        DataCell(Text(product['customer_company_name'] ?? '')),
+                        DataCell(Text(product['product_name'] ?? '')),
+                        DataCell(Text(product['product_qty'] ?? '')),
+                        DataCell(Text(product['total_value'] ?? '')),
+                      ]);
+                    }).toList(),
+                  ),
               ],
             ),
           ),
@@ -300,12 +342,10 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
             Uri.parse(url),
             body: {
               'refNo': refNo ?? '',
-              'customerId': selectedCustomer, // Ensure this is the correct ID
+              'customerId': selectedCustomer,
               'product': selectedProduct,
-              'qty':
-                  quantityController.text, // Replace with actual quantity input
-              'proValue':
-                  amountController.text, // Replace with actual amount input
+              'qty': quantityController.text,
+              'proValue': amountController.text,
             },
           );
           debugPrint(response.body);
