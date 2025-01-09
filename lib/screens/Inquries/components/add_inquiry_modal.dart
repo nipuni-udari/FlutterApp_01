@@ -90,30 +90,67 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
     }
   }
 
-  void addProductToList() {
-    setState(() {
-      final selectedCustomerData = customerList.firstWhere(
-        (customer) => customer.contains(selectedCustomer as Pattern),
-        orElse: () => '',
+  void addProductToList() async {
+    if (selectedCustomer == null || selectedProduct == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select a customer and a product.')),
       );
+      return;
+    }
 
-      final customerName =
-          selectedCustomerData.split(' - ')[1]; // Extract customer name
+    final selectedCustomerData = customerList.firstWhere(
+      (customer) => customer.contains(selectedCustomer as Pattern),
+      orElse: () => '',
+    );
 
-      final selectedProductData = productList.firstWhere(
-        (product) => product['id'].toString() == selectedProduct,
-        orElse: () => {'name': 'Unknown Product'},
+    final customerName =
+        selectedCustomerData.split(' - ')[1]; // Extract customer name
+
+    final selectedProductData = productList.firstWhere(
+      (product) => product['id'].toString() == selectedProduct,
+      orElse: () => {'name': 'Unknown Product'},
+    );
+
+    final productName = selectedProductData['name']; // Extract product name
+
+    final url =
+        'https://demo.secretary.lk/electronics_mobile_app/backend/add_inquiry.php';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'refNo': refNo ?? '',
+        'customerId': selectedCustomer,
+        'product': selectedProduct,
+        'qty': quantityController.text,
+        'proValue': amountController.text,
+      },
+    );
+    debugPrint(response.body);
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['success'] == 'Product added successfully') {
+        setState(() {
+          addedProducts.add({
+            'customer_company_name': customerName,
+            'product_name': productName,
+            'product_qty': quantityController.text,
+            'total_value': amountController.text,
+          });
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Inquiry added successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add inquiry. Please try again.')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add inquiry. Please try again.')),
       );
-
-      final productName = selectedProductData['name']; // Extract product name
-
-      addedProducts.add({
-        'customer_company_name': customerName,
-        'product_name': productName,
-        'product_qty': quantityController.text,
-        'total_value': amountController.text,
-      });
-    });
+    }
   }
 
   @override
@@ -135,7 +172,6 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
               children: [
                 _buildSectionTitle('Customer Information'),
                 Autocomplete<String>(
-                  // Customer Autocomplete
                   optionsBuilder: (TextEditingValue textEditingValue) {
                     if (textEditingValue.text.isEmpty) {
                       return const Iterable<String>.empty();
@@ -230,26 +266,38 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: addProductToList,
-                  child: const Text('Add Product'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFF674AEF), // Set the background color
+                  ),
+                  child: const Text(
+                    'Add Product',
+                    style: TextStyle(color: Colors.white), // White font color
+                  ),
                 ),
                 const SizedBox(height: 16),
                 _buildSectionTitle('Product List'),
                 if (addedProducts.isNotEmpty)
-                  DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Customer')),
-                      DataColumn(label: Text('Product')),
-                      DataColumn(label: Text('Quantity')),
-                      DataColumn(label: Text('Total Value')),
-                    ],
-                    rows: addedProducts.map((product) {
-                      return DataRow(cells: [
-                        DataCell(Text(product['customer_company_name'] ?? '')),
-                        DataCell(Text(product['product_name'] ?? '')),
-                        DataCell(Text(product['product_qty'] ?? '')),
-                        DataCell(Text(product['total_value'] ?? '')),
-                      ]);
-                    }).toList(),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columnSpacing: 16,
+                      columns: const [
+                        DataColumn(label: Text('Customer')),
+                        DataColumn(label: Text('Product')),
+                        DataColumn(label: Text('Quantity')),
+                        DataColumn(label: Text('Total Value')),
+                      ],
+                      rows: addedProducts.map((product) {
+                        return DataRow(cells: [
+                          DataCell(
+                              Text(product['customer_company_name'] ?? '')),
+                          DataCell(Text(product['product_name'] ?? '')),
+                          DataCell(Text(product['product_qty'] ?? '')),
+                          DataCell(Text(product['total_value'] ?? '')),
+                        ]);
+                      }).toList(),
+                    ),
                   ),
               ],
             ),
@@ -289,12 +337,10 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
           ),
           const SizedBox(height: 8),
           Text(
-            refNo != null
-                ? 'Inquiry No: $refNo'
-                : 'Loading reference number...',
+            'Reference No: $refNo',
             style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
+              color: Colors.white,
+              fontSize: 12, // Smaller font size
             ),
           ),
         ],
@@ -303,12 +349,15 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF674AEF),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: Color(0xFF674AEF), // Set the color to your desired color
+        ),
       ),
     );
   }
@@ -316,52 +365,28 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
   List<Widget> _buildDialogActions() {
     return [
       TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Cancel', style: TextStyle(color: Colors.red)),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.red, // Set background color to red
+        ),
+        child: const Text('Cancel'),
       ),
       ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF674AEF),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        onPressed: () async {
-          if (selectedCustomer == null || selectedProduct == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text('Please select a customer and a product.')),
-            );
-            return;
-          }
-
-          final url =
-              'https://demo.secretary.lk/electronics_mobile_app/backend/add_inquiry.php';
-          final response = await http.post(
-            Uri.parse(url),
-            body: {
-              'refNo': refNo ?? '',
-              'customerId': selectedCustomer,
-              'product': selectedProduct,
-              'qty': quantityController.text,
-              'proValue': amountController.text,
-            },
-          );
-          debugPrint(response.body);
-          if (response.statusCode == 200) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Inquiry added successfully!')),
-            );
-            Navigator.of(context).pop();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text('Failed to add inquiry. Please try again.')),
-            );
-          }
+        onPressed: () {
+          addProductToList();
         },
-        child: const Text('Add'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(
+              255, 12, 159, 51), // Set the background color
+        ),
+        child: const Text(
+          'Save',
+          style:
+              TextStyle(color: Colors.white), // White font color for the button
+        ),
       ),
     ];
   }
