@@ -78,7 +78,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
         final List<dynamic> data = responseJson['data'];
         setState(() {
           customerList = data.map((customer) {
-            return '${customer['customer_company_name']} - ${customer['customer_address']}';
+            return '${customer['customer_id']} - ${customer['customer_company_name']} - ${customer['customer_address']}';
           }).toList();
         });
       } else {
@@ -124,13 +124,23 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                     // If no matching customers, call fetchCustomerData
                     if (matchingCustomers.isEmpty) {
                       fetchCustomerData(searchInput: textEditingValue.text);
+                      print('Selected Customer: $customerList');
                     }
 
                     return matchingCustomers;
                   },
                   onSelected: (String selectedCustomer) {
                     setState(() {
-                      this.selectedCustomer = selectedCustomer;
+                      // Find the customer ID based on the selected customer name
+
+                      final selectedCustomerData = customerList.firstWhere(
+                        (customer) => customer.contains(selectedCustomer),
+                        orElse: () => '',
+                      );
+
+                      final customerId = selectedCustomerData.split(' - ')[
+                          0]; // Modify this logic based on your actual customer data format
+                      this.selectedCustomer = customerId;
                     });
                   },
                   fieldViewBuilder:
@@ -298,16 +308,12 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                   amountController.text, // Replace with actual amount input
             },
           );
-          print(quantityController.text);
-          print(selectedCustomer);
-          print(refNo);
-          print(amountController.text);
-
+          debugPrint(response.body);
           if (response.statusCode == 200) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Inquiry added successfully!')),
             );
-            Navigator.of(context).pop(); // Close the modal
+            Navigator.of(context).pop();
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
