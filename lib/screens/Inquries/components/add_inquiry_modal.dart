@@ -18,6 +18,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
   TextEditingController quantityController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   List<Map<String, dynamic>> addedProducts = [];
+  TextEditingController customerSearchController = TextEditingController();
 
   @override
   void initState() {
@@ -72,11 +73,10 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
         'https://demo.secretary.lk/electronics_mobile_app/backend/fetch_customers.php?searchInput=$searchInput';
     try {
       final response = await http.get(Uri.parse(url));
-      print(response.body);
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseJson = json.decode(response.body);
         final List<dynamic> data = responseJson['data'];
+
         setState(() {
           customerList = data.map((customer) {
             return '${customer['customer_id']} - ${customer['customer_company_name']} - ${customer['customer_address']}';
@@ -174,7 +174,8 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                 Autocomplete<String>(
                   optionsBuilder: (TextEditingValue textEditingValue) {
                     if (textEditingValue.text.isEmpty) {
-                      return const Iterable<String>.empty();
+                      fetchCustomerData();
+                      return customerList;
                     }
 
                     final matchingCustomers =
@@ -267,8 +268,8 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                 ElevatedButton(
                   onPressed: addProductToList,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color(0xFF674AEF), // Set the background color
+                    backgroundColor: const Color.fromARGB(
+                        255, 4, 138, 33), // Set the background color
                   ),
                   child: const Text(
                     'Add Product',
@@ -350,13 +351,13 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
 
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         title,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: Color(0xFF674AEF), // Set the color to your desired color
+          fontSize: 14,
+          color: const Color(0xFF674AEF),
         ),
       ),
     );
@@ -365,28 +366,21 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
   List<Widget> _buildDialogActions() {
     return [
       TextButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: Colors.red, // Set background color to red
+        onPressed: () => Navigator.of(context).pop(),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.red, // Text color
         ),
         child: const Text('Cancel'),
       ),
       ElevatedButton(
         onPressed: () {
-          addProductToList();
+          // Add your save action here
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(
-              255, 12, 159, 51), // Set the background color
+          backgroundColor: const Color(0xFF674AEF),
+          foregroundColor: Colors.white, // Text color
         ),
-        child: const Text(
-          'Save',
-          style:
-              TextStyle(color: Colors.white), // White font color for the button
-        ),
+        child: const Text('Place Order'),
       ),
     ];
   }
