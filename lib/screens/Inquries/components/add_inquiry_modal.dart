@@ -98,6 +98,32 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
       return;
     }
 
+    // Show confirmation dialog
+    final shouldAddProduct = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Add Product'),
+          content: const Text('Are you sure you want to add this product?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Cancel
+              child: const Text('No'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true), // Confirm
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldAddProduct == false) {
+      return; // Exit if the user cancels
+    }
+
+    // Proceed to add product
     final selectedCustomerData = customerList.firstWhere(
       (customer) => customer.contains(selectedCustomer as Pattern),
       orElse: () => '',
@@ -138,8 +164,22 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
             'total_value': amountController.text,
           });
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Inquiry added successfully!')),
+
+        // Show success alert
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Success'),
+              content: const Text('Product added successfully!'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
