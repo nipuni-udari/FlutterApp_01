@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:newapp/screens/Inquries/components/add_customer_modal.dart';
 
 class AddInquiryModal extends StatefulWidget {
   const AddInquiryModal({Key? key}) : super(key: key);
@@ -243,15 +244,55 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                   },
                   fieldViewBuilder:
                       (context, controller, focusNode, onFieldSubmitted) {
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: InputDecoration(
-                        labelText: 'Search Customer',
-                        prefixIcon:
-                            const Icon(Icons.search, color: Color(0xFF674AEF)),
-                        border: const OutlineInputBorder(),
-                      ),
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: controller,
+                            focusNode: focusNode,
+                            decoration: InputDecoration(
+                              labelText: 'Search Customer',
+                              prefixIcon: const Icon(Icons.search,
+                                  color: Color(0xFF674AEF)),
+                              border: const OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.add, color: Color(0xFF674AEF)),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const AddCustomerModal();
+                              },
+                            );
+                          },
+                        ),
+                        Column(
+                          children: [
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(
+                                    255, 207, 239, 251), // Background color
+                                borderRadius:
+                                    BorderRadius.circular(30), // Round corners
+                              ),
+                              child: Text(
+                                'Add New Customer',
+                                style: TextStyle(
+                                  color: Color(0xFF674AEF),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     );
                   },
                 ),
