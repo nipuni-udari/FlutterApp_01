@@ -264,7 +264,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
-                                return const AddCustomerModal();
+                                return AddCustomerModal();
                               },
                             );
                           },
