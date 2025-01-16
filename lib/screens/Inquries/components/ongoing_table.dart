@@ -9,19 +9,21 @@ class OngoingTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return inquiries.isEmpty
         ? const Center(child: CircularProgressIndicator())
-        : PaginatedDataTable(
-            header: const Text('Ongoing Inquiries'),
-            columns: const [
-              DataColumn(label: Text('Customer Name')),
-              DataColumn(label: Text('Action Date')),
-              DataColumn(label: Text('Products')),
-              DataColumn(label: Text('Amount')),
-              DataColumn(label: Text('Days')),
-            ],
-            source: _OngoingTableDataSource(inquiries),
-            rowsPerPage: 10, // Number of rows per page
-            columnSpacing: 20.0,
-            showCheckboxColumn: false,
+        : SingleChildScrollView(
+            child: PaginatedDataTable(
+              header: const Text('Ongoing Inquiries'),
+              columns: const [
+                DataColumn(label: Text('Customer Name')),
+                DataColumn(label: Text('Action Date')),
+                DataColumn(label: Text('Products')),
+                DataColumn(label: Text('Amount')),
+                DataColumn(label: Text('Days')),
+              ],
+              source: _OngoingTableDataSource(inquiries),
+              rowsPerPage: 10, // Number of rows per page
+              columnSpacing: 20.0,
+              showCheckboxColumn: false,
+            ),
           );
   }
 }
