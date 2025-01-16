@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:newapp/screens/Inquries/components/Tables/confirm_table.dart';
 import 'dart:convert';
-import 'ongoing_table.dart';
+import 'Tables/ongoing_table.dart';
+import 'Tables/prospect_table.dart';
+import 'Tables/nonProspect_table.dart';
 
 class TabView extends StatefulWidget {
   final String tabName;
@@ -18,10 +21,18 @@ class _TabViewState extends State<TabView> {
   @override
   void initState() {
     super.initState();
-    fetchInquiries();
+    if (widget.tabName == 'Ongoing') {
+      fetchOngoingInquiries();
+    } else if (widget.tabName == 'Prospect') {
+      fetchProspectInquiries();
+    } else if (widget.tabName == 'NonProspect') {
+      fetchNonProspectInquiries();
+    } else if (widget.tabName == 'Confirmed') {
+      fetchConfirmedInquiries();
+    }
   }
 
-  Future<void> fetchInquiries() async {
+  Future<void> fetchOngoingInquiries() async {
     final url = Uri.parse(
         'https://demo.secretary.lk/electronics_mobile_app/backend/get_ongoing_inquiries.php');
     final response = await http.get(url);
@@ -29,9 +40,54 @@ class _TabViewState extends State<TabView> {
     if (response.statusCode == 200) {
       setState(() {
         inquiries = json.decode(response.body);
+        //print(response.body);
       });
     } else {
-      print('Failed to load data');
+      print('Failed to load ongoing data');
+    }
+  }
+
+  Future<void> fetchProspectInquiries() async {
+    final url = Uri.parse(
+        'https://demo.secretary.lk/electronics_mobile_app/backend/get_prospect_inquiries.php');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        inquiries = json.decode(response.body);
+      });
+    } else {
+      print('Failed to load prospect data');
+    }
+  }
+
+  Future<void> fetchNonProspectInquiries() async {
+    final url = Uri.parse(
+        'https://demo.secretary.lk/electronics_mobile_app/backend/get_NonProspect_inquiries.php');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        inquiries = json.decode(response.body);
+        print(response.body);
+      });
+    } else {
+      print('Failed to load non prospect data');
+    }
+  }
+
+  Future<void> fetchConfirmedInquiries() async {
+    final url = Uri.parse(
+        'https://demo.secretary.lk/electronics_mobile_app/backend/get_confirmed_inquiries.php');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        inquiries = json.decode(response.body);
+        print(response.body);
+      });
+    } else {
+      print('Failed to load confirmed data');
     }
   }
 
@@ -42,17 +98,17 @@ class _TabViewState extends State<TabView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Content for ${widget.tabName} Tab',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF674AEF),
-            ),
-          ),
           const SizedBox(height: 20),
           Expanded(
-            child: OngoingTable(inquiries: inquiries),
+            child: widget.tabName == 'Ongoing'
+                ? OngoingTable(inquiries: inquiries)
+                : widget.tabName == 'Prospect'
+                    ? ProspectTable(inquiries: inquiries)
+                    : widget.tabName == 'NonProspect'
+                        ? NonProspectTable(inquiries: inquiries)
+                        : widget.tabName == 'Confirmed'
+                            ? ConfirmedTable(inquiries: inquiries)
+                            : Container(),
           ),
         ],
       ),

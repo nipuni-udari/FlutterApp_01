@@ -21,7 +21,7 @@ class InquriesScreen extends StatelessWidget {
             tabs: [
               Tab(text: 'Ongoing'),
               Tab(text: 'Prospect'),
-              Tab(text: 'Non-Prospect'),
+              Tab(text: 'NonProspect'),
               Tab(text: 'Confirmed'),
             ],
             labelColor: Color.fromARGB(255, 144, 250,
@@ -45,7 +45,7 @@ class InquriesScreen extends StatelessWidget {
             children: [
               TabView(tabName: 'Ongoing'),
               TabView(tabName: 'Prospect'),
-              TabView(tabName: 'Non-Prospect'),
+              TabView(tabName: 'NonProspect'),
               TabView(tabName: 'Confirmed'),
             ],
           ),

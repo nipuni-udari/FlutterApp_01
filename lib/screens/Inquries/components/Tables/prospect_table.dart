@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class OngoingTable extends StatefulWidget {
+class ProspectTable extends StatefulWidget {
   final List<dynamic> inquiries;
 
-  const OngoingTable({Key? key, required this.inquiries}) : super(key: key);
+  const ProspectTable({Key? key, required this.inquiries}) : super(key: key);
 
   @override
-  _OngoingTableState createState() => _OngoingTableState();
+  _ProspectTableState createState() => _ProspectTableState();
 }
 
-class _OngoingTableState extends State<OngoingTable> {
-  int _rowsPerPage = 10; // Default rows per page
+class _ProspectTableState extends State<ProspectTable> {
+  int _rowsPerPage = 5; // Default rows per page
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class _OngoingTableState extends State<OngoingTable> {
             child: Column(
               children: [
                 PaginatedDataTable(
-                  header: const Text('Ongoing Inquiries'),
+                  header: const Text('Prospect Inquiries'),
                   columns: const [
                     DataColumn(label: Text('Customer Name')),
                     DataColumn(label: Text('Action Date')),
@@ -28,7 +28,7 @@ class _OngoingTableState extends State<OngoingTable> {
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Days')),
                   ],
-                  source: _OngoingTableDataSource(widget.inquiries),
+                  source: _ProspectTableDataSource(widget.inquiries),
                   rowsPerPage: _rowsPerPage, // Use the dynamic rows per page
                   columnSpacing: 20.0,
                   showCheckboxColumn: false,
@@ -63,10 +63,10 @@ class _OngoingTableState extends State<OngoingTable> {
   }
 }
 
-class _OngoingTableDataSource extends DataTableSource {
+class _ProspectTableDataSource extends DataTableSource {
   final List<dynamic> inquiries;
 
-  _OngoingTableDataSource(this.inquiries);
+  _ProspectTableDataSource(this.inquiries);
 
   @override
   DataRow? getRow(int index) {
