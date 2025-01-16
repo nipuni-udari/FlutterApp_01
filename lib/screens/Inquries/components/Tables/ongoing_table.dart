@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/Inquries/components/remark_modal.dart';
 
 class OngoingTable extends StatefulWidget {
   final List<dynamic> inquiries;
@@ -10,7 +11,7 @@ class OngoingTable extends StatefulWidget {
 }
 
 class _OngoingTableState extends State<OngoingTable> {
-  int _rowsPerPage = 5; // Default rows per page
+  int _rowsPerPage = 5;
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +29,12 @@ class _OngoingTableState extends State<OngoingTable> {
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Days')),
                   ],
-                  source: _OngoingTableDataSource(widget.inquiries),
-                  rowsPerPage: _rowsPerPage, // Use the dynamic rows per page
+                  source: _OngoingTableDataSource(widget.inquiries, context),
+                  rowsPerPage: _rowsPerPage,
                   columnSpacing: 20.0,
                   showCheckboxColumn: false,
                   onPageChanged: (int rowIndex) {},
                 ),
-                // Custom pagination at the bottom left
                 Padding(
                   padding: const EdgeInsets.only(left: 16.0),
                   child: Row(
@@ -65,8 +65,9 @@ class _OngoingTableState extends State<OngoingTable> {
 
 class _OngoingTableDataSource extends DataTableSource {
   final List<dynamic> inquiries;
+  final BuildContext context;
 
-  _OngoingTableDataSource(this.inquiries);
+  _OngoingTableDataSource(this.inquiries, this.context);
 
   @override
   DataRow? getRow(int index) {
@@ -76,11 +77,29 @@ class _OngoingTableDataSource extends DataTableSource {
     return DataRow(
       cells: [
         DataCell(Text(inquiry['customer_name'] ?? '')),
-        DataCell(Text(inquiry['action_date'] ?? '')),
+        DataCell(
+          ElevatedButton(
+            onPressed: () => _showRemarkModal(inquiry),
+            child: const Text('Add Remark'),
+          ),
+        ),
         DataCell(Text(inquiry['products']?.toString() ?? '')),
         DataCell(Text(inquiry['amount']?.toString() ?? '')),
         DataCell(Text(inquiry['days']?.toString() ?? '')),
       ],
+    );
+  }
+
+  void _showRemarkModal(dynamic inquiry) {
+    showDialog(
+      context: context,
+      builder: (context) => RemarkModal(
+        actionDate: inquiry['action_date'],
+        onSubmit: (selectedDate, remarks) {
+          // Handle the updated values
+          print('Selected Date: $selectedDate, Remarks: $remarks');
+        },
+      ),
     );
   }
 
