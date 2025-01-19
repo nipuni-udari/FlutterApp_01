@@ -53,15 +53,72 @@ class _RemarkModalState extends State<RemarkModal> {
     }
   }
 
+  String getMonthAbbreviation(int month) {
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return (month > 0 && month <= 12) ? monthNames[month - 1] : '';
+  }
+
+  Widget _buildDateBadge(String dateString) {
+    final DateTime date = DateTime.tryParse(dateString) ?? DateTime.now();
+    final String month = getMonthAbbreviation(date.month);
+    final String day = date.day.toString();
+
+    return Container(
+      width: 50.0, // Reduced width
+      height: 50.0, // Reduced height
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF674AEF), Color(0xFF8A6EFF)],
+        ),
+        borderRadius: BorderRadius.circular(6.0), // Reduced corner radius
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            month,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12.0, // Smaller font size
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            day,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18.0, // Smaller font size
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
-      child: SingleChildScrollView(
+      child: SizedBox(
+        height:
+            MediaQuery.of(context).size.height * 0.7, // Limit the dialog height
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
@@ -86,82 +143,122 @@ class _RemarkModalState extends State<RemarkModal> {
             ),
 
             // Content Section
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Customer Name
+                      Text(
+                        'Customer: ${widget.customerName}',
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+
+                      // Action Date Input
+                      GestureDetector(
+                        onTap: _selectDate,
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'Action Date',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text(_selectedDate ?? 'Select Date'),
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+
+                      // Remarks Text Area
+                      TextField(
+                        controller: _remarksController,
+                        decoration: InputDecoration(
+                          labelText: 'Remarks',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 20.0),
+
+                      // Previous Remarks Section
+                      const Text(
+                        'Previous Remarks:',
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10.0),
+
+                      _remarksList.isEmpty
+                          ? const Text('No remarks available.')
+                          : SizedBox(
+                              height:
+                                  200.0, // Limit the height of the remarks list
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _remarksList.length,
+                                itemBuilder: (context, index) {
+                                  final remark = _remarksList[index];
+                                  final String remarkUpdateDate =
+                                      remark['remark_update_date'] ?? '';
+                                  final String remarks =
+                                      remark['remarks'] ?? 'No remarks';
+                                  final String actionDate =
+                                      remark['action_date'] ?? '';
+
+                                  return ListTile(
+                                    leading: _buildDateBadge(actionDate),
+                                    title: Text(
+                                      remarks,
+                                      style: const TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 5.0),
+                                        Text(
+                                          'Remark Update Date: $remarkUpdateDate',
+                                          style: const TextStyle(
+                                              fontSize: 12.0,
+                                              color: Colors.grey),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Buttons Section
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'Customer: ${widget.customerName}',
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
                   ),
-                  const SizedBox(height: 20.0),
-
-                  // Display Remarks
-                  const Text(
-                    'Previous Remarks:',
-                    style:
-                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10.0),
-                  _remarksList.isEmpty
-                      ? const Text('No remarks available.')
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _remarksList.length,
-                          itemBuilder: (context, index) {
-                            final remark = _remarksList[index];
-                            return ListTile(
-                              title: Text(remark['remarks'] ?? 'No remark'),
-                              subtitle: Text(
-                                  'Date: ${remark['remark_update_date'] ?? ''}'),
-                            );
-                          },
-                        ),
-                  const SizedBox(height: 20.0),
-
-                  // Input Fields
-                  GestureDetector(
-                    onTap: _selectDate,
-                    child: InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: 'Action Date',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: Text(_selectedDate ?? 'Select Date'),
-                    ),
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextField(
-                    controller: _remarksController,
-                    decoration: InputDecoration(
-                      labelText: 'Remarks',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 20.0),
-
-                  // Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
-                      ),
-                      const SizedBox(width: 10.0),
-                      ElevatedButton(
-                        onPressed: _submitRemark,
-                        child: const Text('Submit'),
-                      ),
-                    ],
+                  const SizedBox(width: 10.0),
+                  ElevatedButton(
+                    onPressed: _submitRemark,
+                    child: const Text('Submit'),
                   ),
                 ],
               ),
@@ -208,7 +305,6 @@ class _RemarkModalState extends State<RemarkModal> {
     );
 
     if (response.statusCode == 200) {
-      final result = json.decode(response.body);
       await _fetchRemarks();
       Navigator.of(context).pop();
     } else {
