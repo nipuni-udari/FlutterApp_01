@@ -286,11 +286,43 @@ class _RemarkModalState extends State<RemarkModal> {
 
   Future<void> _submitRemark() async {
     if (_selectedDate == null || _remarksController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please provide all required fields.')),
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('Please provide all required fields.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
       );
       return;
     }
+
+    // Show confirmation dialog
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmation'),
+        content: const Text('Are you sure you want to add the remark?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+
+    // If user cancels, return
+    if (confirm != true) return;
 
     final url = Uri.parse(
         'https://demo.secretary.lk/electronics_mobile_app/backend/insert_remark.php');
@@ -305,11 +337,61 @@ class _RemarkModalState extends State<RemarkModal> {
     );
 
     if (response.statusCode == 200) {
-      await _fetchRemarks();
-      Navigator.of(context).pop();
+      final result = json.decode(response.body);
+      if (result['success'] == true) {
+        // Show success alert
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Success'),
+            content: const Text('Remark added successfully!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the alert dialog
+                  Navigator.of(context).pop(); // Close the RemarkModal
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+
+        // Refresh remarks list
+        await _fetchRemarks();
+
+        // Clear the remarks input
+        _remarksController.clear();
+      } else {
+        // Show error alert
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text(result['error'] ?? 'Failed to add remark.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to submit remark.')),
+      // Show error alert for failed HTTP request
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('Failed to submit remark.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
       );
     }
   }

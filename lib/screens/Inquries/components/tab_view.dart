@@ -40,7 +40,6 @@ class _TabViewState extends State<TabView> {
     if (response.statusCode == 200) {
       setState(() {
         inquiries = json.decode(response.body);
-        //print(response.body);
       });
     } else {
       print('Failed to load ongoing data');
@@ -69,7 +68,6 @@ class _TabViewState extends State<TabView> {
     if (response.statusCode == 200) {
       setState(() {
         inquiries = json.decode(response.body);
-        print(response.body);
       });
     } else {
       print('Failed to load non prospect data');
@@ -84,7 +82,6 @@ class _TabViewState extends State<TabView> {
     if (response.statusCode == 200) {
       setState(() {
         inquiries = json.decode(response.body);
-        print(response.body);
       });
     } else {
       print('Failed to load confirmed data');
@@ -101,7 +98,11 @@ class _TabViewState extends State<TabView> {
           const SizedBox(height: 20),
           Expanded(
             child: widget.tabName == 'Ongoing'
-                ? OngoingTable(inquiries: inquiries)
+                ? OngoingTable(
+                    inquiries: inquiries,
+                    refreshData:
+                        fetchOngoingInquiries, // Pass the refresh function
+                  )
                 : widget.tabName == 'Prospect'
                     ? ProspectTable(inquiries: inquiries)
                     : widget.tabName == 'NonProspect'

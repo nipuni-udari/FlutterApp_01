@@ -3,8 +3,11 @@ import 'package:newapp/screens/Inquries/components/remark_modal.dart';
 
 class OngoingTable extends StatefulWidget {
   final List<dynamic> inquiries;
+  final Function() refreshData; // Add this line to pass a callback
 
-  const OngoingTable({Key? key, required this.inquiries}) : super(key: key);
+  const OngoingTable(
+      {Key? key, required this.inquiries, required this.refreshData})
+      : super(key: key);
 
   @override
   _OngoingTableState createState() => _OngoingTableState();
@@ -30,7 +33,8 @@ class _OngoingTableState extends State<OngoingTable> {
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Days')),
                   ],
-                  source: _OngoingTableDataSource(widget.inquiries, context),
+                  source: _OngoingTableDataSource(
+                      widget.inquiries, context, widget.refreshData),
                   rowsPerPage: _rowsPerPage,
                   columnSpacing: 20.0,
                   showCheckboxColumn: false,
@@ -67,8 +71,9 @@ class _OngoingTableState extends State<OngoingTable> {
 class _OngoingTableDataSource extends DataTableSource {
   final List<dynamic> inquiries;
   final BuildContext context;
+  final Function() refreshData; // Store the refreshData callback
 
-  _OngoingTableDataSource(this.inquiries, this.context);
+  _OngoingTableDataSource(this.inquiries, this.context, this.refreshData);
 
   @override
   DataRow? getRow(int index) {
@@ -116,8 +121,11 @@ class _OngoingTableDataSource extends DataTableSource {
           // Update the inquiry with the new action date
           inquiry['action_date'] = selectedDate;
 
-          // Refresh the table
-          notifyListeners();
+          // Call the refreshData function to refresh the table
+          refreshData(); // This will trigger the data refresh in the parent widget
+
+          // Close the modal
+          Navigator.pop(context);
         },
       ),
     );
