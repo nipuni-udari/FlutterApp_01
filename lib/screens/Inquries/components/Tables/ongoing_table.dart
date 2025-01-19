@@ -80,10 +80,23 @@ class _OngoingTableDataSource extends DataTableSource {
         DataCell(Text(inquiry['inquiry_id']?.toString() ?? '')),
         DataCell(Text(inquiry['customer_name'] ?? '')),
         DataCell(
-          ElevatedButton(
-            onPressed: () => _showRemarkModal(inquiry),
-            child: const Text('Add Remark'),
-          ),
+          inquiry['action_date'] != null && inquiry['action_date']!.isNotEmpty
+              ? GestureDetector(
+                  onTap: () => _showRemarkModal(inquiry),
+                  child: Text(
+                    inquiry['action_date']!,
+                    style: TextStyle(
+                      color: Colors
+                          .blue, // Change the color to indicate it's clickable
+                      decoration: TextDecoration
+                          .underline, // Optional: Add underline for emphasis
+                    ),
+                  ),
+                )
+              : ElevatedButton(
+                  onPressed: () => _showRemarkModal(inquiry),
+                  child: const Text('Add Remark'),
+                ),
         ),
         DataCell(Text(inquiry['products']?.toString() ?? '')),
         DataCell(Text(inquiry['amount']?.toString() ?? '')),
@@ -100,9 +113,11 @@ class _OngoingTableDataSource extends DataTableSource {
         inquiryId: inquiry['inquiry_id'] ?? 'Unknown',
         actionDate: inquiry['action_date'] ?? '',
         onSubmit: (selectedDate, remarks) {
-          // Handle the updated values
-          print('Selected Date: $selectedDate, Remarks: $remarks');
-          print('Inquiry ID: ${inquiry['inquiry_id']}'); // For debugging
+          // Update the inquiry with the new action date
+          inquiry['action_date'] = selectedDate;
+
+          // Refresh the table
+          notifyListeners();
         },
       ),
     );
