@@ -23,6 +23,7 @@ class _OngoingTableState extends State<OngoingTable> {
                 PaginatedDataTable(
                   header: const Text('Ongoing Inquiries'),
                   columns: const [
+                    DataColumn(label: Text('Inquiry ID')),
                     DataColumn(label: Text('Customer Name')),
                     DataColumn(label: Text('Action Date')),
                     DataColumn(label: Text('Products')),
@@ -76,6 +77,7 @@ class _OngoingTableDataSource extends DataTableSource {
     final inquiry = inquiries[index];
     return DataRow(
       cells: [
+        DataCell(Text(inquiry['inquiry_id']?.toString() ?? '')),
         DataCell(Text(inquiry['customer_name'] ?? '')),
         DataCell(
           ElevatedButton(
@@ -94,10 +96,13 @@ class _OngoingTableDataSource extends DataTableSource {
     showDialog(
       context: context,
       builder: (context) => RemarkModal(
-        actionDate: inquiry['action_date'],
+        customerName: inquiry['customer_name'] ?? 'Unknown',
+        inquiryId: inquiry['inquiry_id'] ?? 'Unknown',
+        actionDate: inquiry['action_date'] ?? '',
         onSubmit: (selectedDate, remarks) {
           // Handle the updated values
           print('Selected Date: $selectedDate, Remarks: $remarks');
+          print('Inquiry ID: ${inquiry['inquiry_id']}'); // For debugging
         },
       ),
     );
