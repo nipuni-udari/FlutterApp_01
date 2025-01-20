@@ -100,17 +100,18 @@ class _TabViewState extends State<TabView> {
             child: widget.tabName == 'Ongoing'
                 ? OngoingTable(
                     inquiries: inquiries,
-                    refreshData:
-                        fetchOngoingInquiries, // Pass the refresh function
+                    refreshData: fetchOngoingInquiries,
                   )
                 : widget.tabName == 'Prospect'
                     ? ProspectTable(
                         inquiries: inquiries,
-                        refreshData:
-                            fetchProspectInquiries, // Pass the refresh function
+                        refreshData: fetchProspectInquiries,
                       )
                     : widget.tabName == 'NonProspect'
-                        ? NonProspectTable(inquiries: inquiries)
+                        ? ProspectTable(
+                            inquiries: inquiries,
+                            refreshData: fetchNonProspectInquiries,
+                          )
                         : widget.tabName == 'Confirmed'
                             ? ConfirmedTable(inquiries: inquiries)
                             : Container(),
