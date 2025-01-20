@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:newapp/screens/Inquries/components/remark_modal.dart';
+import 'package:newapp/screens/Inquries/components/view_modal.dart';
 
 class OngoingTable extends StatefulWidget {
   final List<dynamic> inquiries;
-  final Function() refreshData; // Add this line to pass a callback
+  final Function() refreshData;
 
   const OngoingTable(
       {Key? key, required this.inquiries, required this.refreshData})
@@ -32,6 +33,7 @@ class _OngoingTableState extends State<OngoingTable> {
                     DataColumn(label: Text('Products')),
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Days')),
+                    DataColumn(label: Text('Actions')), // New column
                   ],
                   source: _OngoingTableDataSource(
                       widget.inquiries, context, widget.refreshData),
@@ -71,7 +73,7 @@ class _OngoingTableState extends State<OngoingTable> {
 class _OngoingTableDataSource extends DataTableSource {
   final List<dynamic> inquiries;
   final BuildContext context;
-  final Function() refreshData; // Store the refreshData callback
+  final Function() refreshData;
 
   _OngoingTableDataSource(this.inquiries, this.context, this.refreshData);
 
@@ -90,11 +92,9 @@ class _OngoingTableDataSource extends DataTableSource {
                   onTap: () => _showRemarkModal(inquiry),
                   child: Text(
                     inquiry['action_date']!,
-                    style: TextStyle(
-                      color: Colors
-                          .blue, // Change the color to indicate it's clickable
-                      decoration: TextDecoration
-                          .underline, // Optional: Add underline for emphasis
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 )
@@ -106,6 +106,38 @@ class _OngoingTableDataSource extends DataTableSource {
         DataCell(Text(inquiry['products']?.toString() ?? '')),
         DataCell(Text(inquiry['amount']?.toString() ?? '')),
         DataCell(Text(inquiry['days']?.toString() ?? '')),
+        DataCell(
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (String value) {
+              if (value == 'View') {
+                _showViewModal(
+                    inquiry); // Update this line to call showViewModal
+              } else if (value == 'Change Status') {
+                _showChangeStatusDialog(inquiry);
+              } else if (value == 'Delete') {
+                _showDeleteDialog(inquiry);
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem(
+                value: 'View',
+                child: Text('View'),
+              ),
+              const PopupMenuItem(
+                value: 'Change Status',
+                child: Text('Change Status'),
+              ),
+              const PopupMenuItem(
+                value: 'Delete',
+                child: Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -118,15 +150,73 @@ class _OngoingTableDataSource extends DataTableSource {
         inquiryId: inquiry['inquiry_id'] ?? 'Unknown',
         actionDate: inquiry['action_date'] ?? '',
         onSubmit: (selectedDate, remarks) {
-          // Update the inquiry with the new action date
           inquiry['action_date'] = selectedDate;
-
-          // Call the refreshData function to refresh the table
-          refreshData(); // This will trigger the data refresh in the parent widget
-
-          // Close the modal
+          refreshData();
           Navigator.pop(context);
         },
+      ),
+    );
+  }
+
+  // Updated method to show the View modal
+  void _showViewModal(dynamic inquiry) {
+    showViewModal(
+      context: context,
+      inquiryId: inquiry['inquiry_id'] ?? '',
+      customerCompanyName: inquiry['customer_name'] ?? 'Unknown',
+    );
+  }
+
+  void _showChangeStatusDialog(dynamic inquiry) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Change Status'),
+        content: DropdownButton<String>(
+          value: inquiry['status'] ?? 'Pending',
+          items: ['Pending', 'In Progress', 'Completed']
+              .map((status) => DropdownMenuItem(
+                    value: status,
+                    child: Text(status),
+                  ))
+              .toList(),
+          onChanged: (value) {
+            inquiry['status'] = value!;
+            refreshData();
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(dynamic inquiry) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Inquiry'),
+        content: Text(
+            'Are you sure you want to delete inquiry ${inquiry['inquiry_id']}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              inquiries.remove(inquiry);
+              refreshData();
+              Navigator.pop(context);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
       ),
     );
   }
