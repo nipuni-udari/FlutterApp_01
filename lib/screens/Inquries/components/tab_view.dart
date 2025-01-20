@@ -108,12 +108,15 @@ class _TabViewState extends State<TabView> {
                         refreshData: fetchProspectInquiries,
                       )
                     : widget.tabName == 'NonProspect'
-                        ? ProspectTable(
+                        ? NonProspectTable(
                             inquiries: inquiries,
                             refreshData: fetchNonProspectInquiries,
                           )
                         : widget.tabName == 'Confirmed'
-                            ? ConfirmedTable(inquiries: inquiries)
+                            ? ConfirmedTable(
+                                inquiries: inquiries,
+                                refreshData: fetchConfirmedInquiries,
+                              )
                             : Container(),
           ),
         ],

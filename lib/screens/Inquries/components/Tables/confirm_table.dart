@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/Inquries/components/remark_modal.dart';
 
 class ConfirmedTable extends StatefulWidget {
   final List<dynamic> inquiries;
+  final Function() refreshData; // Add this line to pass a callback
 
-  const ConfirmedTable({Key? key, required this.inquiries}) : super(key: key);
+  const ConfirmedTable(
+      {Key? key, required this.inquiries, required this.refreshData})
+      : super(key: key);
 
   @override
   _ConfirmedTableState createState() => _ConfirmedTableState();
 }
 
 class _ConfirmedTableState extends State<ConfirmedTable> {
-  int _rowsPerPage = 5; // Default rows per page
+  int _rowsPerPage = 5;
 
   @override
   Widget build(BuildContext context) {
@@ -20,21 +24,22 @@ class _ConfirmedTableState extends State<ConfirmedTable> {
             child: Column(
               children: [
                 PaginatedDataTable(
-                  header: const Text('confirmed Inquiries'),
+                  header: const Text('Ongoing Inquiries'),
                   columns: const [
+                    DataColumn(label: Text('Inquiry ID')),
                     DataColumn(label: Text('Customer Name')),
                     DataColumn(label: Text('Action Date')),
                     DataColumn(label: Text('Products')),
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Days')),
                   ],
-                  source: _ConfirmedTableDataSource(widget.inquiries),
-                  rowsPerPage: _rowsPerPage, // Use the dynamic rows per page
+                  source: _ConfirmedTableDataSource(
+                      widget.inquiries, context, widget.refreshData),
+                  rowsPerPage: _rowsPerPage,
                   columnSpacing: 20.0,
                   showCheckboxColumn: false,
                   onPageChanged: (int rowIndex) {},
                 ),
-                // Custom pagination at the bottom left
                 Padding(
                   padding: const EdgeInsets.only(left: 16.0),
                   child: Row(
@@ -65,8 +70,10 @@ class _ConfirmedTableState extends State<ConfirmedTable> {
 
 class _ConfirmedTableDataSource extends DataTableSource {
   final List<dynamic> inquiries;
+  final BuildContext context;
+  final Function() refreshData; // Store the refreshData callback
 
-  _ConfirmedTableDataSource(this.inquiries);
+  _ConfirmedTableDataSource(this.inquiries, this.context, this.refreshData);
 
   @override
   DataRow? getRow(int index) {
@@ -75,12 +82,52 @@ class _ConfirmedTableDataSource extends DataTableSource {
     final inquiry = inquiries[index];
     return DataRow(
       cells: [
+        DataCell(Text(inquiry['inquiry_id']?.toString() ?? '')),
         DataCell(Text(inquiry['customer_name'] ?? '')),
-        DataCell(Text(inquiry['action_date'] ?? '')),
+        DataCell(
+          inquiry['action_date'] != null && inquiry['action_date']!.isNotEmpty
+              ? GestureDetector(
+                  onTap: () => _showRemarkModal(inquiry),
+                  child: Text(
+                    inquiry['action_date']!,
+                    style: TextStyle(
+                      color: Colors
+                          .blue, // Change the color to indicate it's clickable
+                      decoration: TextDecoration
+                          .underline, // Optional: Add underline for emphasis
+                    ),
+                  ),
+                )
+              : ElevatedButton(
+                  onPressed: () => _showRemarkModal(inquiry),
+                  child: const Text('Add Remark'),
+                ),
+        ),
         DataCell(Text(inquiry['products']?.toString() ?? '')),
         DataCell(Text(inquiry['amount']?.toString() ?? '')),
         DataCell(Text(inquiry['days']?.toString() ?? '')),
       ],
+    );
+  }
+
+  void _showRemarkModal(dynamic inquiry) {
+    showDialog(
+      context: context,
+      builder: (context) => RemarkModal(
+        customerName: inquiry['customer_name'] ?? 'Unknown',
+        inquiryId: inquiry['inquiry_id'] ?? 'Unknown',
+        actionDate: inquiry['action_date'] ?? '',
+        onSubmit: (selectedDate, remarks) {
+          // Update the inquiry with the new action date
+          inquiry['action_date'] = selectedDate;
+
+          // Call the refreshData function to refresh the table
+          refreshData(); // This will trigger the data refresh in the parent widget
+
+          // Close the modal
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
