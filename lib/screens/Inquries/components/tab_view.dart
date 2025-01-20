@@ -104,7 +104,11 @@ class _TabViewState extends State<TabView> {
                         fetchOngoingInquiries, // Pass the refresh function
                   )
                 : widget.tabName == 'Prospect'
-                    ? ProspectTable(inquiries: inquiries)
+                    ? ProspectTable(
+                        inquiries: inquiries,
+                        refreshData:
+                            fetchProspectInquiries, // Pass the refresh function
+                      )
                     : widget.tabName == 'NonProspect'
                         ? NonProspectTable(inquiries: inquiries)
                         : widget.tabName == 'Confirmed'
