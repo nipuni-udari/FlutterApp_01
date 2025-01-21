@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:newapp/screens/Inquries/components/change_status_modal.dart';
 import 'package:newapp/screens/Inquries/components/remark_modal.dart';
 import 'package:newapp/screens/Inquries/components/view_modal.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class OngoingTable extends StatefulWidget {
   final List<dynamic> inquiries;
@@ -245,8 +246,9 @@ class _OngoingTableDataSource extends DataTableSource {
   }
 
   void _showDeleteDialog(dynamic inquiry) {
+    final scaffoldContext = context; // Save the current context
     showDialog(
-      context: context,
+      context: scaffoldContext,
       builder: (context) => AlertDialog(
         title: const Text('Delete Inquiry'),
         content: Text(
@@ -257,10 +259,68 @@ class _OngoingTableDataSource extends DataTableSource {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              inquiries.remove(inquiry);
-              refreshData();
-              Navigator.pop(context);
+            onPressed: () async {
+              Navigator.pop(context); // Close the confirmation dialog
+
+              // Perform the delete operation
+              final response = await http.post(
+                Uri.parse(
+                    'https://demo.secretary.lk/electronics_mobile_app/backend/delete_inquiry.php'),
+                body: {'inquiryId': inquiry['inquiry_id']},
+              );
+
+              final responseData = jsonDecode(response.body);
+
+              if (responseData['status'] == 'error') {
+                // Show error alert
+                showDialog(
+                  context: scaffoldContext, // Use the saved context
+                  builder: (context) => AlertDialog(
+                    title: const Text('Cannot Delete'),
+                    content: Text(responseData['message']),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (responseData['status'] == 'success') {
+                // Remove inquiry locally and refresh data
+                inquiries.remove(inquiry);
+                await refreshData();
+
+                // Show success alert
+                showDialog(
+                  context: scaffoldContext, // Use the saved context
+                  builder: (context) => AlertDialog(
+                    title: const Text('Success'),
+                    content: Text(responseData['message']),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // Handle unexpected response
+                showDialog(
+                  context: scaffoldContext, // Use the saved context
+                  builder: (context) => AlertDialog(
+                    title: const Text('Error'),
+                    content: const Text('An unexpected error occurred.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
             },
             child: const Text('Delete'),
           ),
