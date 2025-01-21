@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/Inquries/components/change_status_modal.dart';
 import 'package:newapp/screens/Inquries/components/remark_modal.dart';
 import 'package:newapp/screens/Inquries/components/view_modal.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class OngoingTable extends StatefulWidget {
   final List<dynamic> inquiries;
-  final Function() refreshData;
+  final Future<void> Function() refreshData;
 
-  const OngoingTable(
-      {Key? key, required this.inquiries, required this.refreshData})
-      : super(key: key);
+  const OngoingTable({
+    Key? key,
+    required this.inquiries,
+    required this.refreshData,
+  }) : super(key: key);
 
   @override
   _OngoingTableState createState() => _OngoingTableState();
@@ -16,16 +21,19 @@ class OngoingTable extends StatefulWidget {
 
 class _OngoingTableState extends State<OngoingTable> {
   int _rowsPerPage = 5;
-
+  @override
   @override
   Widget build(BuildContext context) {
     return widget.inquiries.isEmpty
         ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            child: Column(
+        : RefreshIndicator(
+            onRefresh: widget.refreshData,
+            child: ListView(
               children: [
                 PaginatedDataTable(
-                  header: const Text('Ongoing Inquiries'),
+                  header: Text('Ongoing Inquiries',
+                      style: const TextStyle(
+                          color: Color.fromARGB(255, 7, 141, 36))),
                   columns: const [
                     DataColumn(label: Text('Inquiry ID')),
                     DataColumn(label: Text('Customer Name')),
@@ -33,10 +41,13 @@ class _OngoingTableState extends State<OngoingTable> {
                     DataColumn(label: Text('Products')),
                     DataColumn(label: Text('Amount')),
                     DataColumn(label: Text('Days')),
-                    DataColumn(label: Text('Actions')), // New column
+                    DataColumn(label: Text('Actions')),
                   ],
                   source: _OngoingTableDataSource(
-                      widget.inquiries, context, widget.refreshData),
+                    widget.inquiries,
+                    context,
+                    widget.refreshData,
+                  ),
                   rowsPerPage: _rowsPerPage,
                   columnSpacing: 20.0,
                   showCheckboxColumn: false,
@@ -73,7 +84,7 @@ class _OngoingTableState extends State<OngoingTable> {
 class _OngoingTableDataSource extends DataTableSource {
   final List<dynamic> inquiries;
   final BuildContext context;
-  final Function() refreshData;
+  final Future<void> Function() refreshData;
 
   _OngoingTableDataSource(this.inquiries, this.context, this.refreshData);
 
@@ -158,7 +169,6 @@ class _OngoingTableDataSource extends DataTableSource {
     );
   }
 
-  // Updated method to show the View modal
   void _showViewModal(dynamic inquiry) {
     showViewModal(
       context: context,
@@ -170,28 +180,66 @@ class _OngoingTableDataSource extends DataTableSource {
   void _showChangeStatusDialog(dynamic inquiry) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change Status'),
-        content: DropdownButton<String>(
-          value: inquiry['status'] ?? 'Pending',
-          items: ['Pending', 'In Progress', 'Completed']
-              .map((status) => DropdownMenuItem(
-                    value: status,
-                    child: Text(status),
-                  ))
-              .toList(),
-          onChanged: (value) {
-            inquiry['status'] = value!;
-            refreshData();
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
+      builder: (context) => ChangeStatusModal(
+        inquiryId: inquiry['inquiry_id'] ?? 'Unknown',
+        customerName: inquiry['customer_name'] ?? 'Unknown',
+        onSubmit: (status, actionDate, remarks) async {
+          try {
+            final response = await http.post(
+              Uri.parse(
+                  'https://demo.secretary.lk/electronics_mobile_app/backend/change_status.php'),
+              body: {
+                'inquiry_id': inquiry['inquiry_id'],
+                'status': status,
+                'action_date': actionDate.toIso8601String(),
+                'remarks': remarks,
+                'customer_name': inquiry['customer_name'],
+              },
+            );
+
+            if (response.statusCode == 200) {
+              inquiry['status'] = status;
+              inquiry['action_date'] = actionDate.toIso8601String();
+              refreshData();
+
+              // Show success alert
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Success'),
+                  content: Text('Status updated successfully!'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the success dialog
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              throw Exception('Failed to update status');
+            }
+          } catch (e) {
+            // Show error alert
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Error'),
+                content: Text('Error: ${e.toString()}'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the error dialog
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
       ),
     );
   }
