@@ -128,7 +128,7 @@ class _InquriesScreenState extends State<InquriesScreen> {
                     'Confirmed ($confirmedCount)', // Show dynamic confirmed count
               ),
             ],
-            labelColor: const Color.fromARGB(255, 144, 250, 218),
+            labelColor: const Color.fromARGB(255, 255, 234, 115),
             unselectedLabelColor: Colors.white70,
           ),
         ),
