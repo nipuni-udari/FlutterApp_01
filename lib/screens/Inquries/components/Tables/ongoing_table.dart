@@ -94,26 +94,44 @@ class _OngoingTableDataSource extends DataTableSource {
     if (index >= inquiries.length) return null;
 
     final inquiry = inquiries[index];
+    final String? actionDate = inquiry['action_date'];
+    final String today = DateTime.now()
+        .toIso8601String()
+        .substring(0, 10); // Today's date in 'YYYY-MM-DD' format
+
     return DataRow(
       cells: [
         DataCell(Text(inquiry['inquiry_id']?.toString() ?? '')),
         DataCell(Text(inquiry['customer_name'] ?? '')),
         DataCell(
-          inquiry['action_date'] != null && inquiry['action_date']!.isNotEmpty
-              ? GestureDetector(
+          Row(
+            children: [
+              if (actionDate != null && actionDate.isNotEmpty)
+                GestureDetector(
                   onTap: () => _showRemarkModal(inquiry),
                   child: Text(
-                    inquiry['action_date']!,
+                    actionDate,
                     style: const TextStyle(
                       color: Colors.blue,
                       decoration: TextDecoration.underline,
                     ),
                   ),
                 )
-              : ElevatedButton(
+              else
+                ElevatedButton(
                   onPressed: () => _showRemarkModal(inquiry),
                   child: const Text('Add Remark'),
                 ),
+              if (actionDate != null &&
+                  actionDate.isNotEmpty &&
+                  actionDate == today)
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  tooltip: 'Delete Remark',
+                  onPressed: () => _showDeleteRemarkDialog(inquiry),
+                ),
+            ],
+          ),
         ),
         DataCell(Text(inquiry['products']?.toString() ?? '')),
         DataCell(Text(inquiry['amount']?.toString() ?? '')),
@@ -123,8 +141,7 @@ class _OngoingTableDataSource extends DataTableSource {
             icon: const Icon(Icons.more_vert),
             onSelected: (String value) {
               if (value == 'View') {
-                _showViewModal(
-                    inquiry); // Update this line to call showViewModal
+                _showViewModal(inquiry);
               } else if (value == 'Change Status') {
                 _showChangeStatusDialog(inquiry);
               } else if (value == 'Delete') {
@@ -327,6 +344,106 @@ class _OngoingTableDataSource extends DataTableSource {
         ],
       ),
     );
+  }
+
+  void _showDeleteRemarkDialog(dynamic inquiry) {
+    final todayDate = DateTime.now(); // Get current date
+
+    // Check if the action_date matches today
+    if (inquiry['action_date'] != null) {
+      final actionDate = DateTime.parse(inquiry['action_date']);
+      if (actionDate.year == todayDate.year &&
+          actionDate.month == todayDate.month &&
+          actionDate.day == todayDate.day) {
+        // Proceed with deletion
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Delete Remark'),
+            content: Text(
+                'Are you sure you want to delete the remark for inquiry ${inquiry['inquiry_id']}?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Close the dialog
+                  try {
+                    // Send delete request to backend
+                    final response = await http.post(
+                      Uri.parse(
+                          'https://demo.secretary.lk/electronics_mobile_app/backend/delete_remark.php'),
+                      body: {
+                        'inquiry_id': inquiry['inquiry_id'],
+                        'action_date': inquiry['action_date'], // Send date
+                      },
+                    );
+
+                    final responseData = jsonDecode(response.body);
+
+                    if (responseData['status'] == 'success') {
+                      // Update local inquiry data
+                      inquiry['remarks'] = null;
+                      await refreshData();
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Success'),
+                          content: Text(responseData['message']),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      throw Exception(responseData['message']);
+                    }
+                  } catch (e) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Error'),
+                        content:
+                            Text('Failed to delete remark: ${e.toString()}'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // Show an error if action_date is not today
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Invalid Action'),
+            content: const Text(
+                'Remarks can only be deleted if the action date is today.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   @override
