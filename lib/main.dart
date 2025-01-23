@@ -10,7 +10,6 @@ import 'screens/signup_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/mobile_register.dart';
 import 'screens/otp_screen.dart';
-import 'screens/Inquries/inquries_screen.dart';
 
 void main() {
   runApp(MyApp());

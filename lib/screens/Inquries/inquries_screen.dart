@@ -19,10 +19,22 @@ class InquriesScreen extends StatelessWidget {
           backgroundColor: const Color(0xFF674AEF), // Set the theme color
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Ongoing'),
-              Tab(text: 'Prospect'),
-              Tab(text: 'NonProspect'),
-              Tab(text: 'Confirmed'),
+              Tab(
+                icon: Icon(Icons.timer),
+                text: 'Ongoing',
+              ),
+              Tab(
+                icon: Icon(Icons.monetization_on),
+                text: 'Prospect',
+              ),
+              Tab(
+                icon: Icon(Icons.close),
+                text: 'NonProspect',
+              ),
+              Tab(
+                icon: Icon(Icons.check_circle),
+                text: 'Confirmed',
+              ),
             ],
             labelColor: Color.fromARGB(255, 144, 250,
                 218), // Set the label text color of the tabs to white
