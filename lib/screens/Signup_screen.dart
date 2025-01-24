@@ -160,6 +160,18 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // Refresh function
+  Future<void> _refresh() async {
+    setState(() {
+      usernameController.clear();
+      addressController.clear();
+      emailController.clear();
+      passwordController.clear();
+      successMessage = '';
+      errorMessage = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     myColor = Color(0xFF674AEF);
@@ -240,26 +252,29 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
 
-            // Main content
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 80.0),
-                  child: FadeInUp(
-                    duration: const Duration(seconds: 1),
-                    child: _buildTop(),
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.all(isLandscape ? 12 : 20),
-                      child: _buildBottom(),
+            // Main content with pull-to-refresh
+            RefreshIndicator(
+              onRefresh: _refresh,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 80.0),
+                    child: FadeInUp(
+                      duration: const Duration(seconds: 1),
+                      child: _buildTop(),
                     ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.all(isLandscape ? 12 : 20),
+                        child: _buildBottom(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -22,6 +22,16 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   bool _isPasswordVisible = false;
 
+  Future<void> _refreshFormFields() async {
+    setState(() {
+      mobileController.clear();
+      passwordController.clear();
+      rememberUser = false;
+    });
+    // Add a short delay for better UX
+    await Future.delayed(const Duration(milliseconds: 500));
+  }
+
   @override
   Widget build(BuildContext context) {
     myColor = const Color(0xFF674AEF);
@@ -39,92 +49,96 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: Scaffold(
         backgroundColor: const Color.fromARGB(0, 174, 22, 245),
-        body: Stack(
-          children: [
-            // Back Button
-            Positioned(
-              top: 40,
-              left: 10,
-              child: IconButton(
-                icon:
-                    const Icon(Icons.arrow_back, color: Colors.white, size: 30),
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/welcome');
-                },
-              ),
-            ),
-            // Animated Background Elements
-            Positioned(
-              left: 30,
-              width: 80,
-              height: 200,
-              child: FadeInUp(
-                duration: const Duration(seconds: 1),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/light-1.png'),
-                    ),
-                  ),
+        body: RefreshIndicator(
+          onRefresh: _refreshFormFields,
+          child: Stack(
+            children: [
+              // Back Button
+              Positioned(
+                top: 40,
+                left: 10,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/welcome');
+                  },
                 ),
               ),
-            ),
-            Positioned(
-              left: 140,
-              width: 80,
-              height: 150,
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 1200),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/light-2.png'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 40,
-              top: 40,
-              width: 80,
-              height: 150,
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 1300),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/clock.png'),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 80.0),
-                  child: FadeInUp(
-                    duration: const Duration(seconds: 1),
-                    child: _buildTop(),
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        children: [
-                          _buildBottom(),
-                        ],
+              // Animated Background Elements
+              Positioned(
+                left: 30,
+                width: 80,
+                height: 200,
+                child: FadeInUp(
+                  duration: const Duration(seconds: 1),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/light-1.png'),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+              Positioned(
+                left: 140,
+                width: 80,
+                height: 150,
+                child: FadeInUp(
+                  duration: const Duration(milliseconds: 1200),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/light-2.png'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 40,
+                top: 40,
+                width: 80,
+                height: 150,
+                child: FadeInUp(
+                  duration: const Duration(milliseconds: 1300),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/clock.png'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 80.0),
+                    child: FadeInUp(
+                      duration: const Duration(seconds: 1),
+                      child: _buildTop(),
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          children: [
+                            _buildBottom(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -338,23 +352,25 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final Map<String, dynamic> data = json.decode(response.body);
 
         if (data['success']) {
-          // Navigate to HomeScreen with username
           Navigator.pushReplacementNamed(
             context,
             HomeScreen.routeName,
-            arguments: data['username'], // Pass username as an argument
+            arguments: data['username'],
           );
         } else {
           _showAlert("Login Failed", data['message']);
         }
       } else {
-        _showAlert("Error", "Server error. Please try again later.");
+        _showAlert(
+          "Error",
+          "Unexpected server response: ${response.statusCode}",
+        );
       }
     } catch (e) {
-      _showAlert("Error", "Unable to connect to the server.");
+      _showAlert("Error", "Connection failed. Error: $e");
     }
   }
 
@@ -368,7 +384,7 @@ class _LoginScreenState extends State<LoginScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text("OK"),
             ),

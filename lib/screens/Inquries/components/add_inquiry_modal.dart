@@ -404,16 +404,27 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.add_circle, color: Colors.white),
-              SizedBox(width: 8),
-              Text(
-                'Add a New Inquiry',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Align elements
+            children: [
+              Row(
+                children: const [
+                  Icon(Icons.add_circle, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    'Add a New Inquiry',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the modal when pressed
+                },
               ),
             ],
           ),

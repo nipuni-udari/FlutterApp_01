@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:newapp/screens/reset_otp_screen.dart';
 import 'dart:convert';
-import 'package:animate_do/animate_do.dart'; // Import the animate_do package
+import 'package:animate_do/animate_do.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -25,7 +25,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
 
     final url = Uri.parse(
-        ' https://demo.secretary.lk/electronics_mobile_app/backend/forgot_password.php ');
+        'https://demo.secretary.lk/electronics_mobile_app/backend/forgot_password.php');
 
     try {
       final response = await http.post(url, body: {'mobile': mobileNumber});
@@ -83,6 +83,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _isValidMobileNumber(String mobileNumber) {
     final regex = RegExp(r'^(?:\+94|94|0)?[0-9]{9}$');
     return regex.hasMatch(mobileNumber);
+  }
+
+  Future<void> _refreshFormField() async {
+    // Clear the text field on refresh
+    setState(() {
+      _mobileController.clear();
+    });
+
+    // Simulate a short delay for better user experience
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   @override
@@ -148,84 +158,91 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 28),
-                Column(
-                  children: [
-                    FadeInUp(
-                      // Animation for the text field
-                      child: TextFormField(
-                        controller: _mobileController,
-                        keyboardType: TextInputType.number,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(
-                            Icons.phone,
-                            color: Colors.grey,
+                RefreshIndicator(
+                  onRefresh: _refreshFormField,
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      FadeInUp(
+                        // Animation for the text field
+                        child: TextFormField(
+                          controller: _mobileController,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
-                          hintText: 'Enter mobile number',
-                          hintStyle: const TextStyle(color: Colors.grey),
-                          filled: true,
-                          fillColor: Colors.white,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    ZoomIn(
-                      // Animation for the button
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            final mobileNumber = _mobileController.text.trim();
-                            if (mobileNumber.isEmpty) {
-                              _showAlert('Please enter a mobile number.', null);
-                            } else if (!_isValidMobileNumber(mobileNumber)) {
-                              _showAlert(
-                                  'Please enter a valid Sri Lankan mobile number.',
-                                  null);
-                            } else {
-                              sendOtp(mobileNumber);
-                            }
-                          },
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(buttonColor),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(
+                              Icons.phone,
+                              color: Colors.grey,
+                            ),
+                            hintText: 'Enter mobile number',
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: _isLoading
-                              ? const Text(
-                                  'Sending...',
-                                  style: TextStyle(fontSize: 16),
-                                )
-                              : const Padding(
-                                  padding: EdgeInsets.all(14.0),
-                                  child: Text(
-                                    'Send OTP',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 22),
+                      ZoomIn(
+                        // Animation for the button
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final mobileNumber =
+                                  _mobileController.text.trim();
+                              if (mobileNumber.isEmpty) {
+                                _showAlert(
+                                    'Please enter a mobile number.', null);
+                              } else if (!_isValidMobileNumber(mobileNumber)) {
+                                _showAlert(
+                                    'Please enter a valid Sri Lankan mobile number.',
+                                    null);
+                              } else {
+                                sendOtp(mobileNumber);
+                              }
+                            },
+                            style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              backgroundColor:
+                                  MaterialStateProperty.all<Color>(buttonColor),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24.0),
+                                ),
+                              ),
+                            ),
+                            child: _isLoading
+                                ? const Text(
+                                    'Sending...',
+                                    style: TextStyle(fontSize: 16),
+                                  )
+                                : const Padding(
+                                    padding: EdgeInsets.all(14.0),
+                                    child: Text(
+                                      'Send OTP',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
