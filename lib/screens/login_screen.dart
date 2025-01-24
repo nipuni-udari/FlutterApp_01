@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
 import 'package:newapp/screens/forgot_password_screen.dart';
+import 'package:newapp/screens/home/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -335,17 +337,18 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
 
-      // Check for successful response
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
         if (data['success']) {
-          Navigator.pushReplacementNamed(context, '/home');
-        } else if (data['message'] == 'User does not exist') {
-          _showAlert("Login Failed", "Invalid credentials. Please try again.");
+          // Navigate to HomeScreen with username
+          Navigator.pushReplacementNamed(
+            context,
+            HomeScreen.routeName,
+            arguments: data['username'], // Pass username as an argument
+          );
         } else {
-          _showAlert(
-              "Login Failed", "An unknown error occurred. Please try again.");
+          _showAlert("Login Failed", data['message']);
         }
       } else {
         _showAlert("Error", "Server error. Please try again later.");

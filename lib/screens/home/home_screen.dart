@@ -7,19 +7,21 @@ import 'package:newapp/screens/home/components/categories.dart';
 class HomeScreen extends StatelessWidget {
   static String routeName = "/home";
 
-  const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final String username =
+        ModalRoute.of(context)!.settings.arguments as String;
+
+    return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             children: [
-              HomeHeader(),
-              CustomBanner(),
-              Categories(),
-              SpecialSection(),
+              HomeHeader(username: username), // Pass the username
+              const CustomBanner(),
+              const Categories(),
+              const SpecialSection(),
             ],
           ),
         ),
