@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               HomeHeader(username: username), // Pass the username
-              const CustomBanner(),
+              CustomBanner(username: username),
               const Categories(),
               const SpecialSection(),
             ],

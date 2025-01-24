@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomBanner extends StatelessWidget {
+  final String username;
+
   const CustomBanner({
     Key? key,
+    required this.username, // Add username as a required parameter
   }) : super(key: key);
 
   @override
@@ -24,18 +27,19 @@ class CustomBanner extends StatelessWidget {
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   "Hayleys electronics",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
+                // Replace the static text with dynamic username
                 Text(
-                  "welcome to customer profile",
-                  style: TextStyle(
+                  "Welcome, $username", // Display the username here
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

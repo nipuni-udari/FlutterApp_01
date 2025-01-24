@@ -55,29 +55,46 @@ class HomeHeader extends StatelessWidget {
           Row(
             children: [
               Text(
-                "Hi, $username", // Show username here
+                "$username", // Show username here
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
               const SizedBox(width: 10),
-              Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  color:
-                      const Color.fromARGB(255, 255, 255, 255).withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.person, color: Colors.white),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/profile');
-                  },
-                ),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.person, color: Colors.white),
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    _logout(context);
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem<String>(
+                      value: 'logout',
+                      child: Row(
+                        children: const [
+                          Icon(Icons.logout, color: Colors.black),
+                          SizedBox(width: 10),
+                          Text("Logout"),
+                        ],
+                      ),
+                    ),
+                  ];
+                },
               ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  // Logout function to handle user logout
+  void _logout(BuildContext context) {
+    // Here, clear any session or login data if you're using any
+    // You can also clear data from SharedPreferences or any other method you're using
+    // If no shared preferences, then you might just reset the username.
+
+    // For now, we'll navigate back to the login screen
+    Navigator.pushReplacementNamed(context, '/welcome');
   }
 }
