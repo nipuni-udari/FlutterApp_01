@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:provider/provider.dart';
+import 'package:newapp/user_provider.dart';
 import 'components/tab_view.dart';
 import 'components/add_inquiry_modal.dart';
 
@@ -97,13 +98,17 @@ class _InquriesScreenState extends State<InquriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the username and userHris from UserProvider
+    final username = Provider.of<UserProvider>(context).username;
+    final userHris = Provider.of<UserProvider>(context).userHris;
+
     return DefaultTabController(
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Inquiries',
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            'Inquiries ($userHris)', // Display userHris in the title
+            style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: const Color(0xFF674AEF),
           bottom: TabBar(

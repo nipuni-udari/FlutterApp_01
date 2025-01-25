@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:newapp/screens/Inquries/inquries_screen.dart';
 import 'package:newapp/screens/forgot_password_screen.dart';
 import 'package:newapp/screens/reset_password_screen.dart';
+import 'package:provider/provider.dart';
 import 'screens/reset_otp_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/welcome_screen.dart';
@@ -10,9 +11,17 @@ import 'screens/signup_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/mobile_register.dart';
 import 'screens/otp_screen.dart';
+import 'user_provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

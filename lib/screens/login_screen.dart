@@ -358,7 +358,10 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacementNamed(
             context,
             HomeScreen.routeName,
-            arguments: data['username'],
+            arguments: {
+              'username': data['username'],
+              'userHris': data['userHris'],
+            },
           );
         } else {
           _showAlert("Login Failed", data['message']);

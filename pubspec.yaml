@@ -45,6 +45,7 @@ dependencies:
   scrollable_table_view: ^2.0.3
   intl: ^0.20.1
   shared_preferences: ^2.4.0
+  provider: ^6.0.5
 
 
   
