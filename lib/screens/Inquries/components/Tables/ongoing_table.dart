@@ -283,55 +283,69 @@ class _OngoingTableDataSource extends DataTableSource {
               Navigator.pop(context); // Close the confirmation dialog
 
               // Perform the delete operation
-              final response = await http.post(
-                Uri.parse(
-                    'https://demo.secretary.lk/electronics_mobile_app/backend/delete_inquiry.php'),
-                body: {'inquiryId': inquiry['inquiry_id']},
-              );
-
-              final responseData = jsonDecode(response.body);
-
-              if (responseData['status'] == 'error') {
-                // Show error alert
-                showDialog(
-                  context: scaffoldContext, // Use the saved context
-                  builder: (context) => AlertDialog(
-                    title: const Text('Cannot Delete'),
-                    content: Text(responseData['message']),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
+              try {
+                final response = await http.post(
+                  Uri.parse(
+                      'https://demo.secretary.lk/electronics_mobile_app/backend/delete_inquiry.php'),
+                  body: {'inquiryId': inquiry['inquiry_id']},
                 );
-              } else if (responseData['status'] == 'success') {
-                // Remove inquiry locally and refresh data
-                inquiries.remove(inquiry);
-                await refreshData();
 
-                // Show success alert
-                showDialog(
-                  context: scaffoldContext, // Use the saved context
-                  builder: (context) => AlertDialog(
-                    title: const Text('Success'),
-                    content: Text(responseData['message']),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                // Handle unexpected response
+                final responseData = jsonDecode(response.body);
+
+                if (responseData['status'] == 'error') {
+                  showDialog(
+                    context: scaffoldContext, // Use the saved context
+                    builder: (context) => AlertDialog(
+                      title: const Text('Cannot Delete'),
+                      content: Text(responseData['message']),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (responseData['status'] == 'success') {
+                  // Call refreshData to refresh the parent widget
+                  await refreshData(); // Refresh the data after removal
+
+                  // Show success alert
+                  showDialog(
+                    context: scaffoldContext, // Use the saved context
+                    builder: (context) => AlertDialog(
+                      title: const Text('Success'),
+                      content: Text(responseData['message']),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  showDialog(
+                    context: scaffoldContext, // Use the saved context
+                    builder: (context) => AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text('An unexpected error occurred.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } catch (e) {
+                // Handle network or other errors
                 showDialog(
                   context: scaffoldContext, // Use the saved context
                   builder: (context) => AlertDialog(
                     title: const Text('Error'),
-                    content: const Text('An unexpected error occurred.'),
+                    content: Text('An error occurred: ${e.toString()}'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),

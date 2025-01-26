@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'dart:async'; // Importing the timer package
+import 'dart:async';
 import 'package:newapp/user_provider.dart';
 import 'components/tab_view.dart';
 import 'components/add_inquiry_modal.dart';
@@ -63,9 +63,12 @@ class _InquriesScreenState extends State<InquriesScreen> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          ongoingCount = int.parse(response.body.trim());
-        });
+        int newOngoingCount = int.parse(response.body.trim());
+        if (newOngoingCount != ongoingCount) {
+          setState(() {
+            ongoingCount = newOngoingCount;
+          });
+        }
       } else {
         print(
             'Failed to fetch ongoing count. Status code: ${response.statusCode}');
@@ -82,9 +85,12 @@ class _InquriesScreenState extends State<InquriesScreen> {
       final response = await http.get(Uri.parse(
           'https://demo.secretary.lk/electronics_mobile_app/backend/prospect_count.php?userHris=$userHris'));
       if (response.statusCode == 200) {
-        setState(() {
-          prospectCount = int.parse(response.body.trim());
-        });
+        int newProspectCount = int.parse(response.body.trim());
+        if (newProspectCount != prospectCount) {
+          setState(() {
+            prospectCount = newProspectCount;
+          });
+        }
       } else {
         print(
             'Failed to fetch prospect count. Status code: ${response.statusCode}');
@@ -102,9 +108,12 @@ class _InquriesScreenState extends State<InquriesScreen> {
           'https://demo.secretary.lk/electronics_mobile_app/backend/nonprospect_count.php?userHris=$userHris'));
 
       if (response.statusCode == 200) {
-        setState(() {
-          NonprospectCount = int.parse(response.body.trim());
-        });
+        int newNonprospectCount = int.parse(response.body.trim());
+        if (newNonprospectCount != NonprospectCount) {
+          setState(() {
+            NonprospectCount = newNonprospectCount;
+          });
+        }
       } else {
         print(
             'Failed to fetch nonprospect count. Status code: ${response.statusCode}');
@@ -122,9 +131,12 @@ class _InquriesScreenState extends State<InquriesScreen> {
           'https://demo.secretary.lk/electronics_mobile_app/backend/confirmed_count.php?userHris=$userHris'));
 
       if (response.statusCode == 200) {
-        setState(() {
-          confirmedCount = int.parse(response.body.trim());
-        });
+        int newConfirmedCount = int.parse(response.body.trim());
+        if (newConfirmedCount != confirmedCount) {
+          setState(() {
+            confirmedCount = newConfirmedCount;
+          });
+        }
       } else {
         print(
             'Failed to fetch confirmed count. Status code: ${response.statusCode}');

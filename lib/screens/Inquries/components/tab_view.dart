@@ -19,6 +19,7 @@ class TabView extends StatefulWidget {
 
 class _TabViewState extends State<TabView> {
   List<dynamic> inquiries = [];
+  List<dynamic> previousInquiries = []; // Store previous data for comparison
 
   @override
   void initState() {
@@ -31,6 +32,17 @@ class _TabViewState extends State<TabView> {
       fetchNonProspectInquiries();
     } else if (widget.tabName == 'Confirmed') {
       fetchConfirmedInquiries();
+    }
+  }
+
+  // Compare new data with previous data before updating the state
+  void _updateInquiries(List<dynamic> newInquiries) {
+    if (newInquiries.toString() != previousInquiries.toString()) {
+      setState(() {
+        inquiries = newInquiries;
+        previousInquiries =
+            newInquiries; // Update previous data for future comparison
+      });
     }
   }
 
@@ -53,10 +65,8 @@ class _TabViewState extends State<TabView> {
       final data = json.decode(response.body);
 
       if (data is List && data.isNotEmpty) {
-        // If data is available, update the state
-        setState(() {
-          inquiries = data;
-        });
+        // If data is available, update the inquiries only if it's changed
+        _updateInquiries(data);
       } else {
         // If no data found for the user, show a warning SnackBar
         _showNoDataWarning();
@@ -82,9 +92,8 @@ class _TabViewState extends State<TabView> {
     );
 
     if (response.statusCode == 200) {
-      setState(() {
-        inquiries = json.decode(response.body);
-      });
+      final data = json.decode(response.body);
+      _updateInquiries(data); // Update inquiries only if changed
     } else {
       print('Failed to load prospect data: ${response.body}');
     }
@@ -106,9 +115,8 @@ class _TabViewState extends State<TabView> {
     );
 
     if (response.statusCode == 200) {
-      setState(() {
-        inquiries = json.decode(response.body);
-      });
+      final data = json.decode(response.body);
+      _updateInquiries(data); // Update inquiries only if changed
     } else {
       print('Failed to load non prospect data: ${response.body}');
     }
@@ -130,9 +138,8 @@ class _TabViewState extends State<TabView> {
     );
 
     if (response.statusCode == 200) {
-      setState(() {
-        inquiries = json.decode(response.body);
-      });
+      final data = json.decode(response.body);
+      _updateInquiries(data); // Update inquiries only if changed
     } else {
       print('Failed to load confirmed data: ${response.body}');
     }
