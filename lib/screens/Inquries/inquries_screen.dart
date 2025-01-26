@@ -138,6 +138,9 @@ class _InquriesScreenState extends State<InquriesScreen> {
   Widget build(BuildContext context) {
     final userHris = Provider.of<UserProvider>(context).userHris;
 
+    // Call _fetchCounts() here to make sure it's updated when the UI is built
+    _fetchCounts();
+
     return DefaultTabController(
       length: 4,
       child: Scaffold(
