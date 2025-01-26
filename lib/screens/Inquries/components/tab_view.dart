@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:newapp/user_provider.dart';
+import 'dart:async';
 import 'Tables/ongoing_table.dart';
 import 'Tables/prospect_table.dart';
 import 'Tables/nonProspect_table.dart';
@@ -20,6 +21,7 @@ class TabView extends StatefulWidget {
 class _TabViewState extends State<TabView> {
   List<dynamic> inquiries = [];
   List<dynamic> previousInquiries = []; // Store previous data for comparison
+  Timer? _timer; // Timer for periodic updates
 
   @override
   void initState() {
@@ -33,6 +35,24 @@ class _TabViewState extends State<TabView> {
     } else if (widget.tabName == 'Confirmed') {
       fetchConfirmedInquiries();
     }
+
+    // Start a timer to periodically check for updates
+    _startAutoRefresh();
+  }
+
+  // Start periodic data refresh
+  void _startAutoRefresh() {
+    _timer = Timer.periodic(const Duration(seconds: 30), (Timer t) {
+      if (widget.tabName == 'Ongoing') {
+        fetchOngoingInquiries();
+      } else if (widget.tabName == 'Prospect') {
+        fetchProspectInquiries();
+      } else if (widget.tabName == 'NonProspect') {
+        fetchNonProspectInquiries();
+      } else if (widget.tabName == 'Confirmed') {
+        fetchConfirmedInquiries();
+      }
+    });
   }
 
   // Compare new data with previous data before updating the state
@@ -154,6 +174,12 @@ class _TabViewState extends State<TabView> {
         duration: Duration(seconds: 3), // Show the SnackBar for 3 seconds
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
   }
 
   @override
