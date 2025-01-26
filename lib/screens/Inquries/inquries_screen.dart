@@ -29,9 +29,17 @@ class _InquriesScreenState extends State<InquriesScreen> {
   }
 
   Future<void> _fetchOngoingCount() async {
+    final userHris = Provider.of<UserProvider>(context, listen: false)
+        .userHris; // Get userHris from the provider
+
     try {
-      final response = await http.get(Uri.parse(
-          'https://demo.secretary.lk/electronics_mobile_app/backend/ongoing_count.php'));
+      // Append userHris as a query parameter
+      final response = await http.get(
+        Uri.parse(
+          'https://demo.secretary.lk/electronics_mobile_app/backend/ongoing_count.php?userHris=$userHris',
+        ),
+      );
+
       if (response.statusCode == 200) {
         setState(() {
           ongoingCount =
@@ -43,12 +51,15 @@ class _InquriesScreenState extends State<InquriesScreen> {
     } catch (e) {
       print('Error fetching count: $e');
     }
+    //debugPrint('movieTitle: $userHris');
   }
 
   Future<void> _fetchProspectCount() async {
+    final userHris = Provider.of<UserProvider>(context, listen: false)
+        .userHris; // Get userHris from the provider
     try {
       final response = await http.get(Uri.parse(
-          'https://demo.secretary.lk/electronics_mobile_app/backend/prospect_count.php'));
+          'https://demo.secretary.lk/electronics_mobile_app/backend/prospect_count.php?userHris=$userHris'));
       if (response.statusCode == 200) {
         setState(() {
           prospectCount =
@@ -63,9 +74,12 @@ class _InquriesScreenState extends State<InquriesScreen> {
   }
 
   Future<void> _fetchNonProspectCount() async {
+    final userHris = Provider.of<UserProvider>(context, listen: false)
+        .userHris; // Get userHris from the provider
     try {
       final response = await http.get(Uri.parse(
-          'https://demo.secretary.lk/electronics_mobile_app/backend/nonprospect_count.php'));
+          'https://demo.secretary.lk/electronics_mobile_app/backend/nonprospect_count.php?userHris=$userHris'));
+
       if (response.statusCode == 200) {
         setState(() {
           NonprospectCount =
@@ -80,9 +94,11 @@ class _InquriesScreenState extends State<InquriesScreen> {
   }
 
   Future<void> _fetchConfirmedCount() async {
+    final userHris = Provider.of<UserProvider>(context, listen: false)
+        .userHris; // Get userHris from the provider
     try {
       final response = await http.get(Uri.parse(
-          'https://demo.secretary.lk/electronics_mobile_app/backend/confirmed_count.php'));
+          'https://demo.secretary.lk/electronics_mobile_app/backend/confirmed_count.php?userHris=$userHris'));
       if (response.statusCode == 200) {
         setState(() {
           confirmedCount =
@@ -107,7 +123,7 @@ class _InquriesScreenState extends State<InquriesScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Inquiries ($userHris)', // Display userHris in the title
+            'Inquiries For HRIS: ($userHris)', // Display userHris in the title
             style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: const Color(0xFF674AEF),
