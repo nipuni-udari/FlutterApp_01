@@ -17,8 +17,8 @@ class ChangeStatusModal extends StatefulWidget {
 }
 
 class _ChangeStatusModalState extends State<ChangeStatusModal> {
-  final _statusOptions = ['Prospect', 'NonProspect', 'Confirmed'];
-  String _selectedStatus = 'Prospect';
+  final _statusOptions = ['PROSPECT', 'NON_PROSPECT', 'CONFIRMED'];
+  String _selectedStatus = 'PROSPECT';
   DateTime _selectedDate = DateTime.now();
   final TextEditingController _remarksController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
