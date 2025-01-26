@@ -220,6 +220,9 @@ class _ProspectTableDataSource extends DataTableSource {
               inquiry['action_date'] = actionDate.toIso8601String();
               refreshData();
 
+              // Close the modal first
+              Navigator.of(context).pop(); // Closes the ChangeStatusModal
+
               // Show success alert
               showDialog(
                 context: context,

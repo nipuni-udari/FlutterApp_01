@@ -195,16 +195,6 @@ class _OngoingTableDataSource extends DataTableSource {
     );
   }
 
-/*************  ✨ Codeium Command ⭐  *************/
-  /// Shows a modal dialog to change the status of an inquiry.
-  ///
-  /// This function creates a [ChangeStatusModal] widget and shows it in a dialog.
-  /// The modal allows the user to input a new status, action date, and remarks.
-  /// When the user submits the form, it sends a POST request to the backend
-  /// to update the status of the inquiry. If the request is successful, it updates
-  /// the local inquiry data and shows a success alert. If the request fails, it
-  /// shows an error alert.
-/******  9d745e25-cca8-4aa1-988e-97fc4cb1c27c  *******/
   void _showChangeStatusDialog(dynamic inquiry) {
     showDialog(
       context: context,
@@ -229,6 +219,9 @@ class _OngoingTableDataSource extends DataTableSource {
               inquiry['status'] = status;
               inquiry['action_date'] = actionDate.toIso8601String();
               refreshData();
+
+              // Close the modal first
+              Navigator.of(context).pop(); // Closes the ChangeStatusModal
 
               // Show success alert
               showDialog(
