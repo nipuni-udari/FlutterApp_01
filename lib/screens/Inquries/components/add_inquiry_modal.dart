@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:newapp/user_provider.dart';
 import 'package:newapp/screens/Inquries/components/add_customer_modal.dart';
 
 class AddInquiryModal extends StatefulWidget {
@@ -92,6 +94,8 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
   }
 
   void addProductToList() async {
+    final userHris = Provider.of<UserProvider>(context, listen: false).userHris;
+
     if (selectedCustomer == null || selectedProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please select a customer and a product.')),
@@ -150,9 +154,9 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
         'product': selectedProduct,
         'qty': quantityController.text,
         'proValue': amountController.text,
+        'userHris': userHris, // Added userHris to the request body
       },
     );
-    debugPrint(response.body);
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
@@ -167,7 +171,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
         });
 
         // Show success alert
-        showDialog(
+        await showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
@@ -182,6 +186,15 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
             );
           },
         );
+
+        // Refresh page by reloading the state
+        setState(() {
+          // Logic to refresh the page (e.g., re-fetching data or updating UI)
+          selectedCustomer = null;
+          selectedProduct = null;
+          quantityController.clear();
+          amountController.clear();
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add inquiry. Please try again.')),

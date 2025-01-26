@@ -195,6 +195,16 @@ class _OngoingTableDataSource extends DataTableSource {
     );
   }
 
+/*************  ✨ Codeium Command ⭐  *************/
+  /// Shows a modal dialog to change the status of an inquiry.
+  ///
+  /// This function creates a [ChangeStatusModal] widget and shows it in a dialog.
+  /// The modal allows the user to input a new status, action date, and remarks.
+  /// When the user submits the form, it sends a POST request to the backend
+  /// to update the status of the inquiry. If the request is successful, it updates
+  /// the local inquiry data and shows a success alert. If the request fails, it
+  /// shows an error alert.
+/******  9d745e25-cca8-4aa1-988e-97fc4cb1c27c  *******/
   void _showChangeStatusDialog(dynamic inquiry) {
     showDialog(
       context: context,
@@ -349,76 +359,77 @@ class _OngoingTableDataSource extends DataTableSource {
   void _showDeleteRemarkDialog(dynamic inquiry) {
     final todayDate = DateTime.now(); // Get current date
 
-    // Check if the action_date matches today
     if (inquiry['action_date'] != null) {
       final actionDate = DateTime.parse(inquiry['action_date']);
       if (actionDate.year == todayDate.year &&
           actionDate.month == todayDate.month &&
           actionDate.day == todayDate.day) {
-        // Proceed with deletion
+        final dialogContext = context; // Store valid context
         showDialog(
-          context: context,
+          context: dialogContext,
           builder: (context) => AlertDialog(
             title: const Text('Delete Remark'),
             content: Text(
                 'Are you sure you want to delete the remark for inquiry ${inquiry['inquiry_id']}?'),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
-                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(dialogContext); // Close the dialog
                   try {
-                    // Send delete request to backend
                     final response = await http.post(
                       Uri.parse(
                           'https://demo.secretary.lk/electronics_mobile_app/backend/delete_remark.php'),
                       body: {
                         'inquiry_id': inquiry['inquiry_id'],
-                        'action_date': inquiry['action_date'], // Send date
+                        'action_date': inquiry['action_date'],
                       },
                     );
-
+                    // debugPrint(response.body);
                     final responseData = jsonDecode(response.body);
 
                     if (responseData['status'] == 'success') {
-                      // Update local inquiry data
                       inquiry['remarks'] = null;
                       await refreshData();
 
+                      if (dialogContext.mounted) {
+                        showDialog(
+                          context: dialogContext,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Success'),
+                            content: Text(responseData['message']),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    } else {
+                      throw Exception(responseData['message']);
+                    }
+                  } catch (e) {
+                    if (dialogContext.mounted) {
                       showDialog(
-                        context: context,
+                        context: dialogContext,
                         builder: (context) => AlertDialog(
-                          title: const Text('Success'),
-                          content: Text(responseData['message']),
+                          title: const Text('Error'),
+                          content:
+                              Text('Failed to delete remark: ${e.toString()}'),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () => Navigator.pop(dialogContext),
                               child: const Text('OK'),
                             ),
                           ],
                         ),
                       );
-                    } else {
-                      throw Exception(responseData['message']);
                     }
-                  } catch (e) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Error'),
-                        content:
-                            Text('Failed to delete remark: ${e.toString()}'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
                   }
                 },
                 child: const Text('Delete'),
@@ -427,7 +438,6 @@ class _OngoingTableDataSource extends DataTableSource {
           ),
         );
       } else {
-        // Show an error if action_date is not today
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
