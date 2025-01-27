@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:newapp/screens/home/home_screen.dart';
 import 'package:newapp/user_provider.dart';
 import 'section_title.dart';
+import 'package:newapp/screens/Inquries/inquries_screen.dart';
 
 class SpecialSection extends StatelessWidget {
   const SpecialSection({Key? key}) : super(key: key);
@@ -45,19 +46,19 @@ class SpecialSection extends StatelessWidget {
               'https://demo.secretary.lk/electronics_mobile_app/backend/ongoing_count.php?userHris=$userHris',
         ),
         CardData(
-          image: "assets/images/Image Banner 3.jpeg",
+          image: "assets/images/Image Banner 3.jpg",
           category: "Prospect",
           statusUrl:
               'https://demo.secretary.lk/electronics_mobile_app/backend/prospect_count.php?userHris=$userHris',
         ),
         CardData(
-          image: "assets/images/Image Banner 3.jpeg",
+          image: "assets/images/Image Banner 4.jpg",
           category: "Non Prospect",
           statusUrl:
               'https://demo.secretary.lk/electronics_mobile_app/backend/nonprospect_count.php?userHris=$userHris',
         ),
         CardData(
-          image: "assets/images/Image Banner 3.jpeg",
+          image: "assets/images/Image Banner 5.jpg",
           category: "Confirmed",
           statusUrl:
               'https://demo.secretary.lk/electronics_mobile_app/backend/confirmed_count.php?userHris=$userHris',
@@ -72,7 +73,7 @@ class SpecialSection extends StatelessWidget {
       return SpecialOfferCard(
         cardData: data,
         press: () {
-          Navigator.pushNamed(context, HomeScreen.routeName);
+          Navigator.pushNamed(context, '/inquries');
         },
       );
     }).toList();
@@ -176,7 +177,7 @@ class _SpecialOfferCardState extends State<SpecialOfferCard>
                       end: Alignment.topCenter,
                       colors: [
                         Colors.black.withOpacity(0.7),
-                        Colors.transparent,
+                        const Color.fromARGB(79, 126, 2, 235),
                       ],
                     ),
                   ),
