@@ -122,7 +122,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                           FadeInUp(
                             duration: const Duration(milliseconds: 1600),
                             child: Text(
-                              "The most Secure Platform for Customers",
+                              "The Most Secure Platform for Hayleys Electronics",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: screenWidth < 400 ? 20 : 25,
@@ -140,7 +140,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.1),
                               child: const Text(
-                                "Built-in Fingerprint, face recognition, and more, keeping you completely safe",
+                                "OTP verifications, Email verifications and more, keeping you completely safe",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 17,

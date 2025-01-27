@@ -76,19 +76,11 @@ class _SplashScreenState extends State<SplashScreen>
                   return SlideTransition(
                     position: _animation,
                     child: Image.asset('assets/images/logo.png',
-                        width: 200, height: 200),
+                        width: 300, height: 300),
                   );
                 },
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Welcome to Your App',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ],
           ),
         ),

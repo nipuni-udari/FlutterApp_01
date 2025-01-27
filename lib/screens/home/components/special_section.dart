@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:newapp/screens/home/home_screen.dart';
 import 'package:newapp/user_provider.dart';
 import 'section_title.dart';
-import 'package:newapp/screens/Inquries/inquries_screen.dart';
 
 class SpecialSection extends StatelessWidget {
   const SpecialSection({Key? key}) : super(key: key);

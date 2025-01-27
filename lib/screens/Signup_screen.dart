@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:newapp/screens/login_screen.dart';
@@ -446,7 +447,7 @@ class _SignupScreenState extends State<SignupScreen> {
         foregroundColor: Colors.white,
       ),
       child: isLoading
-          ? CircularProgressIndicator(color: Colors.white)
+          ? SpinKitThreeBounce(color: Colors.white)
           : const Text("SIGN UP"),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:newapp/screens/Inquries/components/change_status_modal.dart';
 import 'package:newapp/screens/Inquries/components/remark_modal.dart';
 import 'package:newapp/screens/Inquries/components/view_modal.dart';
@@ -26,7 +27,8 @@ class _OngoingTableState extends State<OngoingTable> {
   @override
   Widget build(BuildContext context) {
     return widget.inquiries.isEmpty
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(
+            child: SpinKitChasingDots(color: Color.fromARGB(255, 162, 63, 255)))
         : RefreshIndicator(
             onRefresh: widget.refreshData,
             child: ListView(
