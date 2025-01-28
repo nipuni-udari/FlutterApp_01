@@ -105,12 +105,26 @@ class _CustomBannerState extends State<CustomBanner>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        "Welcome, ${widget.username}",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      ShaderMask(
+                        shaderCallback: (bounds) => LinearGradient(
+                          colors: [
+                            Colors.white,
+                            const Color.fromARGB(255, 54, 222, 244),
+                            Colors.yellow
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(bounds),
+                        child: Text(
+                          "Welcome, ${widget.username}",
+                          style: const TextStyle(
+                            color: Colors
+                                .white, // This will be overridden by the gradient
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            fontFamily:
+                                'Carattere', // Replace with your desired font family
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
