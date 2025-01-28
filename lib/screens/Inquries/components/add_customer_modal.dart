@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 import 'dart:convert';
 
 class AddCustomerModal extends StatefulWidget {
@@ -17,6 +18,8 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
   final TextEditingController contactNoController = TextEditingController();
 
   bool isLoading = false;
+  double? latitude;
+  double? longitude;
 
   // Email validation
   bool isValidEmail(String email) {
@@ -47,6 +50,18 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
     );
   }
 
+  // Determine location
+  Future<void> getLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      latitude = position.latitude;
+      longitude = position.longitude;
+    } catch (e) {
+      showAlert('Location Error', 'Unable to fetch location: $e');
+    }
+  }
+
   void saveCustomer() async {
     // Validate inputs
     if (emailController.text.isNotEmpty &&
@@ -66,6 +81,17 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
       isLoading = true;
     });
 
+    // Fetch location
+    await getLocation();
+
+    if (latitude == null || longitude == null) {
+      setState(() {
+        isLoading = false;
+      });
+      showAlert('Location Required', 'Please enable location services.');
+      return;
+    }
+
     const String url =
         'https://demo.secretary.lk/electronics_mobile_app/backend/save_customer.php';
     try {
@@ -76,6 +102,8 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
           'email': emailController.text,
           'companyAddress': companyAddressController.text,
           'contactNo': contactNoController.text,
+          'latitude': latitude.toString(),
+          'longitude': longitude.toString(),
         },
       );
 
