@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AddCustomerModal extends StatefulWidget {
@@ -50,15 +51,35 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
     );
   }
 
-  // Determine location
+  // Request location permissions and fetch location
   Future<void> getLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      latitude = position.latitude;
-      longitude = position.longitude;
-    } catch (e) {
-      showAlert('Location Error', 'Unable to fetch location: $e');
+    // Request location permissions
+    final whenInUseStatus = await Permission.locationWhenInUse.request();
+
+    if (whenInUseStatus.isGranted) {
+      // Check for background permission if necessary
+      final alwaysStatus = await Permission.locationAlways.request();
+
+      if (alwaysStatus.isGranted) {
+        try {
+          Position position = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high);
+          latitude = position.latitude;
+          longitude = position.longitude;
+        } catch (e) {
+          showAlert('Error', 'Failed to get location: $e');
+        }
+      } else if (alwaysStatus.isDenied) {
+        showAlert('Background Permission Denied',
+            'To access location all the time, please enable the "Allow All the Time" option in app settings.');
+      }
+    } else if (whenInUseStatus.isDenied) {
+      showAlert(
+          'Permission Denied', 'Location access denied. Please allow access.');
+    } else if (whenInUseStatus.isPermanentlyDenied) {
+      await openAppSettings();
+      showAlert('Permission Required',
+          'Please enable location permissions from app settings.');
     }
   }
 
