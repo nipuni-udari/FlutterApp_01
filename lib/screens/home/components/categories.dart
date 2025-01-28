@@ -15,9 +15,9 @@ class Categories extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const InquriesScreen()),
             ),
       },
-      {"icon": Icons.receipt, "text": "Bill", "onTap": () {}},
-      {"icon": Icons.videogame_asset, "text": "Game", "onTap": () {}},
-      {"icon": Icons.card_giftcard, "text": "Daily Gift", "onTap": () {}},
+      {"icon": Icons.receipt, "text": "Upcoming", "onTap": () {}},
+      {"icon": Icons.videogame_asset, "text": "Upcoming", "onTap": () {}},
+      {"icon": Icons.card_giftcard, "text": "Upcoming", "onTap": () {}},
       {"icon": Icons.more_horiz, "text": "More", "onTap": () {}},
     ];
     return Padding(
