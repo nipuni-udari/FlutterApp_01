@@ -137,9 +137,13 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
               children: [
                 Container(
                   height: size.height * 0.3,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF674AEF),
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF674AEF), Color(0xFF4B2C8B)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(32),
                       bottomRight: Radius.circular(32),
                     ),
@@ -189,9 +193,10 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: const Color.fromARGB(255, 119, 9, 253)
+                          .withOpacity(0.2),
                       blurRadius: 8,
-                      spreadRadius: 4,
+                      spreadRadius: 9,
                     ),
                   ],
                 ),
@@ -206,6 +211,9 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                           labelText: 'Company Name',
                           prefixIcon: const Icon(Icons.business),
                           border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF674AEF), // Theme color
+                            ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
@@ -217,6 +225,9 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                           labelText: 'Email Address',
                           prefixIcon: const Icon(Icons.email),
                           border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF674AEF), // Theme color
+                            ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
@@ -228,6 +239,9 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                           labelText: 'Company Address',
                           prefixIcon: const Icon(Icons.location_on),
                           border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF674AEF), // Theme color
+                            ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
@@ -240,6 +254,9 @@ class _AddCustomerModalState extends State<AddCustomerModal> {
                           labelText: 'Contact No',
                           prefixIcon: const Icon(Icons.phone),
                           border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF674AEF), // Theme color
+                            ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
