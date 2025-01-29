@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:newapp/screens/forgot_password_screen.dart';
 import 'package:newapp/screens/home/home_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,6 +22,27 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   bool _isPasswordVisible = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedMobile = prefs.getString('mobile');
+    final savedPassword = prefs.getString('password');
+    final savedRemember = prefs.getBool('rememberUser') ?? false;
+
+    if (savedRemember && savedMobile != null && savedPassword != null) {
+      setState(() {
+        mobileController.text = savedMobile;
+        passwordController.text = savedPassword;
+        rememberUser = savedRemember;
+      });
+    }
+  }
+
   Future<void> _refreshFormFields() async {
     setState(() {
       mobileController.clear();
@@ -30,6 +51,19 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     // Add a short delay for better UX
     await Future.delayed(const Duration(milliseconds: 500));
+  }
+
+  Future<void> _saveCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (rememberUser) {
+      await prefs.setString('mobile', mobileController.text);
+      await prefs.setString('password', passwordController.text);
+      await prefs.setBool('rememberUser', true);
+    } else {
+      await prefs.remove('mobile');
+      await prefs.remove('password');
+      await prefs.setBool('rememberUser', false);
+    }
   }
 
   @override
