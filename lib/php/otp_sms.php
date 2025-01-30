@@ -3,6 +3,8 @@
 ini_set('display_errors', 'on');
 include('connect.php');
 include('./ESMSWS.php'); // Include SMS sending class
+include('EMP_DB_connect.php');
+
 
 $randomOtp = rand(100000, 999999);
 $mobile = filter_input(INPUT_POST, 'mobile', FILTER_SANITIZE_NUMBER_INT); // Validate mobile number
@@ -32,6 +34,17 @@ if ($result->num_rows > 0) {
     exit;
 }
 
+
+// Check if the mobile number exists in EMB_DB
+$embQuery = $DB_HRIS_conn->prepare("SELECT * FROM EMB_DB WHERE Mobile = ?");
+$embQuery->bind_param('s', $mobile);
+$embQuery->execute();
+$embResult = $embQuery->get_result();
+
+if ($embResult->num_rows > 0) {
+    echo json_encode(['status' => 'exists', 'message' => 'You are already registered. Please proceed to log in.']);
+    exit;
+}
 
 // Save the new user
 $registerDate = date('Y-m-d H:i:s');

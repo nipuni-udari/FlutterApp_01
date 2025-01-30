@@ -4,7 +4,7 @@ ini_set('display_errors', 'off');
 $servername = "payslip.lk";
 $username = "NIPUNI";
 $password = "Nipuni@1234";
-$dbname = "service_desk";
+$dbname = "hel_db";
 
 // Create connection
 $conn = mysqli_connect($servername, $username, $password, $dbname);
