@@ -39,7 +39,7 @@ class _InquriesScreenState extends State<InquriesScreen> {
 
   // Function to periodically refresh the counts
   void _startAutoRefresh() {
-    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _fetchCounts(); // Call the fetch function every 30 seconds
     });
   }

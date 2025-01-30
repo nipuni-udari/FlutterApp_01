@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +28,7 @@ class SpecialSection extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              ..._buildSpecialOfferCards(context, cardsPerRow, userHris),
+              ..._buildSpecialOfferCards(context, userHris),
               const SizedBox(width: 70),
             ],
           ),
@@ -63,8 +64,7 @@ class SpecialSection extends StatelessWidget {
         ),
       ];
 
-  List<Widget> _buildSpecialOfferCards(
-      BuildContext context, int cardsPerRow, String userHris) {
+  List<Widget> _buildSpecialOfferCards(BuildContext context, String userHris) {
     final cardData = _cardData(userHris);
 
     return cardData.map((data) {
@@ -106,15 +106,22 @@ class SpecialOfferCard extends StatefulWidget {
   _SpecialOfferCardState createState() => _SpecialOfferCardState();
 }
 
-class _SpecialOfferCardState extends State<SpecialOfferCard>
-    with SingleTickerProviderStateMixin {
+class _SpecialOfferCardState extends State<SpecialOfferCard> {
   String? statusCount;
   bool isHovered = false;
+  Timer? _timer; // Timer for auto-refresh
 
   @override
   void initState() {
     super.initState();
     fetchStatusCount();
+    _startAutoRefresh();
+  }
+
+  void _startAutoRefresh() {
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      fetchStatusCount();
+    });
   }
 
   Future<void> fetchStatusCount() async {
@@ -122,8 +129,7 @@ class _SpecialOfferCardState extends State<SpecialOfferCard>
       final response = await http.get(Uri.parse(widget.cardData.statusUrl));
       if (response.statusCode == 200) {
         setState(() {
-          statusCount =
-              response.body; // Update the status count with the response body
+          statusCount = response.body;
         });
       } else {
         setState(() {
@@ -138,6 +144,12 @@ class _SpecialOfferCardState extends State<SpecialOfferCard>
   }
 
   @override
+  void dispose() {
+    _timer?.cancel(); // Cancel timer to prevent memory leaks
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 20),
@@ -149,7 +161,7 @@ class _SpecialOfferCardState extends State<SpecialOfferCard>
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            width: isHovered ? 320 : 300, // Increase size on hover
+            width: isHovered ? 320 : 300,
             height: isHovered ? 180 : 150,
             decoration: BoxDecoration(
               boxShadow: [
@@ -159,7 +171,7 @@ class _SpecialOfferCardState extends State<SpecialOfferCard>
                   offset: const Offset(0, 5),
                 ),
               ],
-              borderRadius: BorderRadius.circular(20), // Rounded corners
+              borderRadius: BorderRadius.circular(20),
               image: DecorationImage(
                 image: AssetImage(widget.cardData.image),
                 fit: BoxFit.cover,

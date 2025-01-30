@@ -42,7 +42,7 @@ class _TabViewState extends State<TabView> {
 
   // Start periodic data refresh
   void _startAutoRefresh() {
-    _timer = Timer.periodic(const Duration(seconds: 30), (Timer t) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       if (widget.tabName == 'Ongoing') {
         fetchOngoingInquiries();
       } else if (widget.tabName == 'Prospect') {
