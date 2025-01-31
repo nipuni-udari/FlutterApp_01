@@ -100,7 +100,8 @@ class _CustomBannerState extends State<CustomBanner>
                         "Hayleys Electronics",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -120,10 +121,8 @@ class _CustomBannerState extends State<CustomBanner>
                           style: const TextStyle(
                             color: Colors
                                 .white, // This will be overridden by the gradient
-                            fontSize: 25,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            fontFamily:
-                                'Carattere', // Replace with your desired font family
                           ),
                         ),
                       ),
@@ -148,7 +147,7 @@ class _CustomBannerState extends State<CustomBanner>
                       ),
                     ),
                     child: Image.asset(
-                      'assets/images/vector.png',
+                      'assets/images/robot.png',
                       fit: BoxFit.contain,
                       height: 120,
                       width: 120,

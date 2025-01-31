@@ -38,7 +38,7 @@ class HomeHeader extends StatelessWidget {
           const Text(
             'Hayleys Electronics',
             style: TextStyle(
-              fontFamily: 'Charm', // Using the Charm font
+              //fontFamily: 'Charm', // Using the Charm font
               color: Colors.white,
               fontSize: 18, // Adjust font size as needed
               fontWeight: FontWeight.bold,

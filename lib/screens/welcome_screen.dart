@@ -91,7 +91,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                 duration: const Duration(milliseconds: 1500),
                 child: Center(
                   child: Image.asset(
-                    "assets/images/welcome.png",
+                    "assets/images/robot.png",
                     width: screenWidth * 0.7,
                     height: screenHeight * 0.5,
                     fit: BoxFit.contain,
@@ -127,6 +127,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                               style: TextStyle(
                                 fontSize: screenWidth < 400 ? 20 : 25,
                                 fontWeight: FontWeight.w600,
+                                color: const Color.fromARGB(255, 2, 128, 90),
                                 letterSpacing: 1,
                                 wordSpacing: 2,
                               ),
