@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -14,6 +15,7 @@ class AddInquiryModal extends StatefulWidget {
 
 class _AddInquiryModalState extends State<AddInquiryModal> {
   List<Map<String, dynamic>> productList = [];
+  List<dynamic> refeProductList = [];
   String? refNo;
   String? selectedProduct;
   List<String> customerList = [];
@@ -22,6 +24,12 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
   TextEditingController amountController = TextEditingController();
   List<Map<String, dynamic>> addedProducts = [];
   TextEditingController customerSearchController = TextEditingController();
+  Double? productTotal;
+  int? insertedId;
+
+  String? ProductQty;
+  String? CompanyName;
+  String? ProductName;
 
   @override
   void initState() {
@@ -38,7 +46,8 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         setState(() {
-          refNo = response.body.trim();
+          refNo = response.body.trim() +
+              Provider.of<UserProvider>(context, listen: false).userHris;
         });
       } else {
         print('Failed to fetch reference number');
@@ -160,6 +169,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
+      // print(response.body);
       if (responseData['success'] == 'Product added successfully') {
         setState(() {
           addedProducts.add({
@@ -168,9 +178,24 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
             'product_qty': quantityController.text,
             'total_value': amountController.text,
           });
+          // Assign the products array to refeProductList
+          // if (responseData['products'] != null) {
+          //   refeProductList =
+          //       List<Map<String, dynamic>>.from(responseData['products']);
+          // }
         });
-
+        print(responseData['products']);
+        insertedId = responseData['insertedId'];
+        ProductQty = responseData['product_quantity'];
+        CompanyName = responseData['Company_name'];
+        ProductName = responseData['product_name'];
+        // refeProductList.add(responseData['products']);
+        refeProductList = [responseData['products']];
+        // print(responseData['products']);
+        // print(productTotal);
         // Show success alert
+        // Assign the products array to refeProductList
+
         await showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -190,7 +215,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
         // Refresh page by reloading the state
         setState(() {
           // Logic to refresh the page (e.g., re-fetching data or updating UI)
-          selectedCustomer = null;
+          // selectedCustomer = null;
           selectedProduct = null;
           quantityController.clear();
           amountController.clear();
@@ -203,6 +228,59 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add inquiry. Please try again.')),
+      );
+    }
+  }
+
+  void productPlaceOrder() async {
+    print(insertedId);
+    print(jsonEncode(refeProductList));
+    final url =
+        'https://demo.secretary.lk/electronics_mobile_app/backend/place_order.php';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'inquiryId': insertedId?.toString() ?? '',
+        'CompanyName': CompanyName.toString(),
+        'ProductName': ProductName.toString(),
+        'ProductQty': ProductQty.toString(),
+        'username': Provider.of<UserProvider>(context, listen: false).username,
+        'productList': jsonEncode(refeProductList),
+        'refNo': refNo ?? '',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      print(response.body);
+      if (responseData['success'] == 'Order placed successfully') {
+        // Show success alert
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Success'),
+              content: const Text('Order placed successfully!'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the success dialog
+                    Navigator.of(context).pop(); // Close the AddInquiryModal
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to place order. Please try again.')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to place order. Please try again.')),
       );
     }
   }
@@ -442,13 +520,6 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            'Reference No: $refNo',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12, // Smaller font size
-            ),
-          ),
         ],
       ),
     );
@@ -478,9 +549,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
         child: const Text('Cancel'),
       ),
       ElevatedButton(
-        onPressed: () {
-          // Add your save action here
-        },
+        onPressed: productPlaceOrder,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF674AEF),
           foregroundColor: Colors.white, // Text color
