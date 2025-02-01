@@ -6,7 +6,8 @@ import 'package:newapp/user_provider.dart';
 import 'section_title.dart';
 
 class SpecialSection extends StatelessWidget {
-  const SpecialSection({Key? key}) : super(key: key);
+  final Function(int) onCardTap;
+  const SpecialSection({Key? key, required this.onCardTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +72,7 @@ class SpecialSection extends StatelessWidget {
       return SpecialOfferCard(
         cardData: data,
         press: () {
-          Navigator.pushNamed(context, '/inquries');
+          onCardTap(1); // Change to Inquiries tab when tapped
         },
       );
     }).toList();

@@ -158,7 +158,7 @@ class _InquriesScreenState extends State<InquriesScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Inquiries For HRIS: ($userHris)',
+            'INQURIES',
             style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: const Color(0xFF674AEF),

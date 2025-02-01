@@ -147,7 +147,12 @@ class _OngoingTableDataSource extends DataTableSource {
               } else if (value == 'Change Status') {
                 _showChangeStatusDialog(inquiry);
               } else if (value == 'Delete') {
-                _showDeleteDialog(inquiry);
+                if (inquiry['action_date'] != null &&
+                    inquiry['action_date'].isNotEmpty) {
+                  _showCannotDeleteInquiry(inquiry);
+                } else {
+                  _showDeleteDialog(inquiry);
+                }
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -363,6 +368,79 @@ class _OngoingTableDataSource extends DataTableSource {
         ],
       ),
     );
+  }
+
+  Future<void> _showCannotDeleteInquiry(dynamic inquiry) async {
+    final scaffoldContext = context;
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://demo.secretary.lk/electronics_mobile_app/backend/delete_inquiry.php'),
+        body: {'inquiryId': inquiry['inquiry_id']},
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (responseData['status'] == 'error') {
+        await showDialog(
+          context: scaffoldContext,
+          builder: (context) => AlertDialog(
+            title: const Text('Cannot Delete'),
+            content: Text(responseData['message']),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else if (responseData['status'] == 'success') {
+        await refreshData(); // Refresh the data after removal
+
+        await showDialog(
+          context: scaffoldContext,
+          builder: (context) => AlertDialog(
+            title: const Text('Success'),
+            content: Text(responseData['message']),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        await showDialog(
+          context: scaffoldContext,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('An unexpected error occurred.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      await showDialog(
+        context: scaffoldContext,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('An error occurred: ${e.toString()}'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void _showDeleteRemarkDialog(dynamic inquiry) {

@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/screens/Inquries/inquries_screen.dart';
 import 'package:newapp/screens/home/components/calender.dart';
 import 'package:newapp/screens/home/components/special_section.dart';
+import 'package:newapp/screens/welcome_screen.dart';
 import 'package:newapp/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'components/custom_bottom_navbar.dart';
 import 'components/home_header.dart';
 import 'package:newapp/screens/home/components/banner.dart';
-import 'package:newapp/screens/home/components/categories.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   static String routeName = "/home";
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+  final PageController _pageController = PageController();
+
+  void _updateIndex(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    _pageController.jumpToPage(index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,27 +34,49 @@ class HomeScreen extends StatelessWidget {
     final String username = args['username'];
     final String userHris = args['userHris'];
 
-    // Set the user data in UserProvider
     Provider.of<UserProvider>(context, listen: false)
         .setUser(username, userHris);
 
+    final List<Widget> _pages = [
+      _buildHomePage(username, userHris),
+      InquriesScreen(),
+      WelcomeScreen(),
+    ];
+
     return Scaffold(
-      body: SafeArea(
-        child: Scrollbar(
-          thumbVisibility: true, // Makes the scroll bar always visible
-          thickness: 8, // Adjusts the width of the scrollbar
-          radius: Radius.circular(8), // Gives the scrollbar rounded corners
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              children: [
-                HomeHeader(username: username),
-                CustomBanner(username: username, userHris: userHris),
-                const Categories(),
-                const SpecialSection(),
-                CalendarWidget(), // Add the calendar widget here
-              ],
-            ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: _pages,
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          _updateIndex(index);
+        },
+      ),
+    );
+  }
+
+  Widget _buildHomePage(String username, String userHris) {
+    return SafeArea(
+      child: Scrollbar(
+        thumbVisibility: true,
+        thickness: 8,
+        radius: Radius.circular(8),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            children: [
+              HomeHeader(username: username),
+              CustomBanner(username: username, userHris: userHris),
+              SpecialSection(onCardTap: _updateIndex), // Pass function
+              CalendarWidget(),
+            ],
           ),
         ),
       ),

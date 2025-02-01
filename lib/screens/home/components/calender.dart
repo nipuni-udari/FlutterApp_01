@@ -4,6 +4,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:newapp/user_provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'section_title.dart';
 
 class CalendarWidget extends StatefulWidget {
@@ -19,9 +20,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   @override
   void initState() {
     super.initState();
-    // Initialize the CalendarController in initState
     _calendarController = CalendarController();
-    // Set today's date as selected
     _calendarController?.selectedDate = DateTime.now();
     _fetchRemarks();
   }
@@ -29,11 +28,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   Future<void> _fetchRemarks() async {
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final userHris = userProvider.userHris; // Retrieve userHris
+      final userHris = userProvider.userHris;
 
       final response = await http.post(
         Uri.parse(
-            'https://demo.secretary.lk/electronics_mobile_app/backend/calendar_data.php'), // Replace with your backend URL
+            'https://demo.secretary.lk/electronics_mobile_app/backend/calendar_data.php'),
         body: {'userHris': userHris},
       );
 
@@ -94,10 +93,15 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _isLoading
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: SpinKitThreeBounce(
+                          color: Color(0xFF674AEF),
+                          size: 50.0,
+                        ),
+                      )
                     : SfCalendar(
                         view: CalendarView.month,
-                        controller: _calendarController, // Set the controller
+                        controller: _calendarController,
                         dataSource: AppointmentDataSource(_appointments),
                         monthViewSettings: const MonthViewSettings(
                           appointmentDisplayMode:
@@ -113,11 +117,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        showNavigationArrow: true, // Enable navigation arrows
+                        showNavigationArrow: true,
                         onTap: (details) {
-                          if (details.targetElement == CalendarElement.header) {
-                            // Handle header click for month/year selection
-                          }
+                          if (details.targetElement ==
+                              CalendarElement.header) {}
                         },
                         monthCellBuilder: (context, details) {
                           bool hasEvent = details.appointments.isNotEmpty;
