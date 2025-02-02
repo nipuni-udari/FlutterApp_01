@@ -5,30 +5,32 @@ class SectionTitle extends StatelessWidget {
     Key? key,
     required this.title,
     required this.press,
+    this.padding = const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+    this.titleStyle = const TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w700,
+      color: Colors.black87,
+    ),
   }) : super(key: key);
 
   final String title;
   final GestureTapCallback press;
+  final EdgeInsetsGeometry padding;
+  final TextStyle titleStyle;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+    return Padding(
+      padding: padding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: titleStyle.copyWith(),
           ),
-        ),
-        TextButton(
-          onPressed: press,
-          style: TextButton.styleFrom(foregroundColor: Colors.grey),
-          child: const Text("See more"),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
