@@ -128,7 +128,7 @@ class _RemarkModalState extends State<RemarkModal> {
         borderRadius: BorderRadius.circular(20.0),
       ),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.7,
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Column(
           children: [
             // Header
@@ -220,7 +220,7 @@ class _RemarkModalState extends State<RemarkModal> {
                           : _remarksList.isEmpty
                               ? const Text('No remarks available.')
                               : SizedBox(
-                                  height: 120.0,
+                                  height: 150.0,
                                   child: _remarksList.isEmpty
                                       ? const Center(
                                           child: Text('No remarks available.'))
