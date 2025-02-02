@@ -59,7 +59,8 @@ class _ChangeStatusModalState extends State<ChangeStatusModal> {
   Future<void> _showConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // User must tap a button to dismiss
+      barrierDismissible:
+          false, // Prevents closing the dialog by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Are you sure you want to update this?'),

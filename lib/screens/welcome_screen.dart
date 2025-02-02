@@ -142,7 +142,7 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.1),
                               child: const Text(
-                                "OTP verifications, Email verifications and more, keeping you completely safe",
+                                "Explore the latest in electronics technology with Hayleys Electronics.",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 17,

@@ -209,6 +209,7 @@ class _InquriesScreenState extends State<InquriesScreen> {
           onPressed: () => showDialog(
             context: context,
             builder: (context) => const AddInquiryModal(),
+            barrierDismissible: false, //keyboard static
           ),
           backgroundColor: const Color(0xFF674AEF),
           icon: const Icon(Icons.add, color: Colors.white),

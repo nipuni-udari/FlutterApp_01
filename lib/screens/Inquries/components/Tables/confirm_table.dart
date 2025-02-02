@@ -200,6 +200,7 @@ class _ConfirmedTableDataSource extends DataTableSource {
   void _showChangeStatusDialog(dynamic inquiry) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => ChangeStatusModal(
         inquiryId: inquiry['inquiry_id'] ?? 'Unknown',
         customerName: inquiry['customer_name'] ?? 'Unknown',

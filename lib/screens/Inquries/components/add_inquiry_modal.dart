@@ -14,6 +14,7 @@ class AddInquiryModal extends StatefulWidget {
 }
 
 class _AddInquiryModalState extends State<AddInquiryModal> {
+  bool isCustomerSelected = false;
   List<Map<String, dynamic>> productList = [];
   List<dynamic> refeProductList = [];
   String? refNo;
@@ -331,59 +332,137 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                       );
                       this.selectedCustomer =
                           selectedCustomerData.split(' - ')[0];
+                      // Set the flag to true when a customer is selected
+                      isCustomerSelected = true;
                     });
+                    print(this.selectedCustomer);
                   },
                   fieldViewBuilder:
                       (context, controller, focusNode, onFieldSubmitted) {
-                    return Row(
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            decoration: InputDecoration(
-                              labelText: 'Search Customer',
-                              prefixIcon: const Icon(Icons.search,
-                                  color: Color(0xFF674AEF)),
-                              border: const OutlineInputBorder(),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.add, color: Color(0xFF674AEF)),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AddCustomerModal();
-                              },
-                            );
-                          },
-                        ),
-                        Column(
+                        // Search field row
+                        Row(
                           children: [
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(
-                                    255, 207, 239, 251), // Background color
-                                borderRadius:
-                                    BorderRadius.circular(30), // Round corners
-                              ),
-                              child: Text(
-                                'Add New Customer',
-                                style: TextStyle(
-                                  color: Color(0xFF674AEF),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                            Expanded(
+                              child: TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                decoration: InputDecoration(
+                                  labelText: 'Search Customer',
+                                  prefixIcon: const Icon(Icons.search,
+                                      color: Color(0xFF674AEF)),
+                                  suffixIcon: controller.text.isNotEmpty
+                                      ? IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () {
+                                            controller.clear();
+                                            setState(() {
+                                              selectedCustomer = null;
+                                              isCustomerSelected = false;
+                                            });
+                                          },
+                                        )
+                                      : null,
+                                  border: const OutlineInputBorder(),
                                 ),
                               ),
                             ),
                           ],
-                        )
+                        ),
+                        const SizedBox(height: 8), // Add some spacing
+                        // Conditionally render the "Add New Customer" button
+                        if (!isCustomerSelected)
+                          ElevatedButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AddCustomerModal();
+                                },
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color.fromARGB(
+                                  255, 207, 239, 251), // Background color
+                              foregroundColor:
+                                  Color(0xFF674AEF), // Text and icon color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    30), // Rounded corners
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8), // Padding
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min, // Fit the content
+                              children: const [
+                                Icon(Icons.add), // Plus icon
+                                SizedBox(
+                                    width: 8), // Spacing between icon and text
+                                Text(
+                                  'Add New Customer',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
+                    );
+                  },
+                  optionsViewBuilder: (context, onSelected, options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4.0,
+                        child: Container(
+                          width: MediaQuery.of(context).size.width *
+                              0.6, // Adjust width as needed
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemCount: options.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final option = options.elementAt(index);
+                              final parts = option.split(' - ');
+                              final customerId = parts[0];
+                              final companyName = parts[1];
+                              final customerAddress = parts[2];
+
+                              return InkWell(
+                                onTap: () {
+                                  onSelected(option);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '$customerId - $companyName',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        customerAddress,
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -414,6 +493,7 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                     Expanded(
                       child: TextField(
                         controller: quantityController,
+                        keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                           labelText: 'Quantity',
                           prefixIcon: Icon(Icons.confirmation_number,
@@ -426,6 +506,8 @@ class _AddInquiryModalState extends State<AddInquiryModal> {
                     Expanded(
                       child: TextField(
                         controller: amountController,
+                        keyboardType: TextInputType.numberWithOptions(
+                            decimal: true), // Add this line
                         decoration: const InputDecoration(
                           labelText: 'Amount',
                           prefixIcon: Icon(Icons.attach_money,
