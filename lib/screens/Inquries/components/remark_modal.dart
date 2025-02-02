@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -24,6 +25,7 @@ class _RemarkModalState extends State<RemarkModal> {
   final TextEditingController _remarksController = TextEditingController();
   String? _selectedDate;
   List<dynamic> _remarksList = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -33,23 +35,33 @@ class _RemarkModalState extends State<RemarkModal> {
   }
 
   Future<void> _fetchRemarks() async {
-    final url = Uri.parse(
-        'https://demo.secretary.lk/electronics_mobile_app/backend/insert_remark.php');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'inquiryId': widget.inquiryId}),
-    );
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      setState(() {
-        _remarksList = result['remarks'] ?? [];
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to fetch remarks.')),
+    try {
+      final url = Uri.parse(
+          'https://demo.secretary.lk/electronics_mobile_app/backend/insert_remark.php');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'inquiryId': widget.inquiryId}),
       );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        setState(() {
+          _remarksList = result['remarks'] ?? [];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to fetch remarks.')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -77,13 +89,13 @@ class _RemarkModalState extends State<RemarkModal> {
     final String day = date.day.toString();
 
     return Container(
-      width: 50.0, // Reduced width
-      height: 50.0, // Reduced height
+      width: 50.0,
+      height: 50.0,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF674AEF), Color(0xFF8A6EFF)],
         ),
-        borderRadius: BorderRadius.circular(6.0), // Reduced corner radius
+        borderRadius: BorderRadius.circular(6.0),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -92,7 +104,7 @@ class _RemarkModalState extends State<RemarkModal> {
             month,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 12.0, // Smaller font size
+              fontSize: 12.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -100,7 +112,7 @@ class _RemarkModalState extends State<RemarkModal> {
             day,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 18.0, // Smaller font size
+              fontSize: 18.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -116,8 +128,7 @@ class _RemarkModalState extends State<RemarkModal> {
         borderRadius: BorderRadius.circular(20.0),
       ),
       child: SizedBox(
-        height:
-            MediaQuery.of(context).size.height * 0.7, // Limit the dialog height
+        height: MediaQuery.of(context).size.height * 0.7,
         child: Column(
           children: [
             // Header
@@ -130,10 +141,10 @@ class _RemarkModalState extends State<RemarkModal> {
                     const BorderRadius.vertical(top: Radius.circular(20.0)),
               ),
               padding: const EdgeInsets.all(16.0),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'Add Remark',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -189,56 +200,93 @@ class _RemarkModalState extends State<RemarkModal> {
                       const SizedBox(height: 20.0),
 
                       // Previous Remarks Section
-                      const Text(
-                        'Previous Remarks:',
-                        style: TextStyle(
+                      Text(
+                        'Previous Remarks (${_remarksList.length}):',
+                        style: const TextStyle(
                             fontSize: 16.0, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10.0),
 
-                      _remarksList.isEmpty
-                          ? const Text('No remarks available.')
-                          : SizedBox(
-                              height:
-                                  200.0, // Limit the height of the remarks list
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: _remarksList.length,
-                                itemBuilder: (context, index) {
-                                  final remark = _remarksList[index];
-                                  final String remarkUpdateDate =
-                                      remark['remark_update_date'] ?? '';
-                                  final String remarks =
-                                      remark['remarks'] ?? 'No remarks';
-                                  final String actionDate =
-                                      remark['action_date'] ?? '';
-
-                                  return ListTile(
-                                    leading: _buildDateBadge(actionDate),
-                                    title: Text(
-                                      remarks,
-                                      style: const TextStyle(
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 5.0),
-                                        Text(
-                                          'Remark Update Date: $remarkUpdateDate',
-                                          style: const TextStyle(
-                                              fontSize: 12.0,
-                                              color: Colors.grey),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                      _isLoading
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20.0),
+                                child: SpinKitFadingCircle(
+                                  color: Color(0xFF674AEF),
+                                  size: 50.0,
+                                ),
                               ),
-                            ),
+                            )
+                          : _remarksList.isEmpty
+                              ? const Text('No remarks available.')
+                              : SizedBox(
+                                  height: 120.0,
+                                  child: _remarksList.isEmpty
+                                      ? const Center(
+                                          child: Text('No remarks available.'))
+                                      : SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children:
+                                                _remarksList.map((remark) {
+                                              final String remarkUpdateDate =
+                                                  remark['remark_update_date'] ??
+                                                      '';
+                                              final String remarks =
+                                                  remark['remarks'] ??
+                                                      'No remarks';
+                                              final String actionDate =
+                                                  remark['action_date'] ?? '';
+
+                                              return Container(
+                                                width:
+                                                    180.0, // Adjust as needed
+                                                margin: const EdgeInsets.only(
+                                                    right: 10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.3),
+                                                      blurRadius: 5.0,
+                                                      spreadRadius: 2.0,
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    _buildDateBadge(actionDate),
+                                                    const SizedBox(height: 5.0),
+                                                    Text(
+                                                      remarks,
+                                                      style: const TextStyle(
+                                                        fontSize: 14.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'Updated: $remarkUpdateDate',
+                                                      style: const TextStyle(
+                                                        fontSize: 12.0,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                ),
                     ],
                   ),
                 ),
@@ -302,7 +350,6 @@ class _RemarkModalState extends State<RemarkModal> {
       return;
     }
 
-    // Show confirmation dialog
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -321,7 +368,6 @@ class _RemarkModalState extends State<RemarkModal> {
       ),
     );
 
-    // If user cancels, return
     if (confirm != true) return;
 
     final url = Uri.parse(
@@ -339,7 +385,6 @@ class _RemarkModalState extends State<RemarkModal> {
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       if (result['success'] == true) {
-        // Show success alert
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -348,8 +393,8 @@ class _RemarkModalState extends State<RemarkModal> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close the alert dialog
-                  Navigator.of(context).pop(); // Close the RemarkModal
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                 },
                 child: const Text('OK'),
               ),
@@ -357,13 +402,9 @@ class _RemarkModalState extends State<RemarkModal> {
           ),
         );
 
-        // Refresh remarks list
         await _fetchRemarks();
-
-        // Clear the remarks input
         _remarksController.clear();
       } else {
-        // Show error alert
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -379,7 +420,6 @@ class _RemarkModalState extends State<RemarkModal> {
         );
       }
     } else {
-      // Show error alert for failed HTTP request
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
