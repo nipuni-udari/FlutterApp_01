@@ -26,8 +26,8 @@ class CustomBottomNavBar extends StatelessWidget {
           label: 'Inquries',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings',
+          icon: Icon(Icons.person),
+          label: 'Profile',
         ),
       ],
       selectedItemColor: const Color(0xFF674AEF),

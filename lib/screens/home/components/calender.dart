@@ -48,7 +48,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     .add(Duration(hours: 1)),
                 subject:
                     "🏢 ${remark['customer_company_name']}\n📝 ${remark['remarks']}",
-                color: const Color.fromARGB(255, 174, 115, 247),
+                color: Color(0xFF674AEF),
                 isAllDay: true,
               );
             }).toList();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:newapp/screens/Inquries/inquries_screen.dart';
 import 'package:newapp/screens/home/components/calender.dart';
 import 'package:newapp/screens/home/components/special_section.dart';
+import 'package:newapp/screens/profile/user_profile.dart';
 import 'package:newapp/screens/welcome_screen.dart';
 import 'package:newapp/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> _pages = [
       _buildHomePage(username, userHris),
       InquriesScreen(),
-      WelcomeScreen(),
+      ProfilePage(),
     ];
 
     return Scaffold(
