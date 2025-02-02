@@ -15,136 +15,139 @@ class HomeHeader extends StatelessWidget {
     // Get the user HRIS ID from the provider
     final userHris = Provider.of<UserProvider>(context).userHris;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF674AEF), // Theme color
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10), // You can adjust or remove this if needed
+        decoration: BoxDecoration(
+          color: const Color(0xFF674AEF), // Theme color
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Beautifully styled Text with Charm font
-          const Text(
-            'Hayleys Electronics',
-            style: TextStyle(
-              //fontFamily: 'Charm', // Using the Charm font
-              color: Colors.white,
-              fontSize: 18, // Adjust font size as needed
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5, // Add space between letters
-              shadows: [
-                Shadow(
-                  blurRadius: 10.0,
-                  color: Color.fromARGB(255, 16, 16, 16),
-                  offset: Offset(3.0, 3.0),
-                ),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
-          ),
-          Row(
-            children: [
-              // Notification Icon with Count
-              FutureBuilder<int>(
-                future: _fetchNotificationCount(userHris), // Fetch count
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // Use ThreeRotatingDots
-                    return const SpinKitThreeBounce(
-                      color: Colors.white,
-                      size: 24.0,
-                    );
-                  } else if (snapshot.hasError) {
-                    return const Text('Error');
-                  } else if (snapshot.hasData) {
-                    final count = snapshot.data ?? 0;
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.notifications,
-                              color: Colors.white),
-                          onPressed: () {
-                            // Handle notification icon press
-                          },
-                        ),
-                        if (count > 0)
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 16,
-                                minHeight: 16,
-                              ),
-                              child: Text(
-                                '$count', // Display the dynamic count
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  }
-                  return const Text('No data');
-                },
-              ),
-              const SizedBox(width: 10),
-              // Username and Logout Button
-              Row(
-                children: [
-                  Text(
-                    username, // Show username here
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  const SizedBox(width: 10),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.person, color: Colors.white),
-                    onSelected: (value) {
-                      if (value == 'logout') {
-                        _logout(context);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return [
-                        PopupMenuItem<String>(
-                          value: 'logout',
-                          child: Row(
-                            children: const [
-                              Icon(Icons.logout, color: Colors.black),
-                              SizedBox(width: 10),
-                              Text("Logout"),
-                            ],
-                          ),
-                        ),
-                      ];
-                    },
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Beautifully styled Text with Charm font
+            const Text(
+              'Hayleys Electronics',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18, // Adjust font size as needed
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5, // Add space between letters
+                shadows: [
+                  Shadow(
+                    blurRadius: 10.0,
+                    color: Color.fromARGB(255, 16, 16, 16),
+                    offset: Offset(3.0, 3.0),
                   ),
                 ],
               ),
-            ],
-          ),
-        ],
+            ),
+            Row(
+              children: [
+                // Notification Icon with Count
+                FutureBuilder<int>(
+                  future: _fetchNotificationCount(userHris), // Fetch count
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      // Use ThreeRotatingDots
+                      return const SpinKitThreeBounce(
+                        color: Colors.white,
+                        size: 24.0,
+                      );
+                    } else if (snapshot.hasError) {
+                      return const Text('Error');
+                    } else if (snapshot.hasData) {
+                      final count = snapshot.data ?? 0;
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.notifications,
+                                color: Colors.white),
+                            onPressed: () {
+                              // Handle notification icon press
+                            },
+                          ),
+                          if (count > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '$count', // Display the dynamic count
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    }
+                    return const Text('No data');
+                  },
+                ),
+                const SizedBox(width: 10),
+                // Username and Logout Button
+                Row(
+                  children: [
+                    Text(
+                      username, // Show username here
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    const SizedBox(width: 10),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.person, color: Colors.white),
+                      onSelected: (value) {
+                        if (value == 'logout') {
+                          _logout(context);
+                        }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return [
+                          PopupMenuItem<String>(
+                            value: 'logout',
+                            child: Row(
+                              children: const [
+                                Icon(Icons.logout, color: Colors.black),
+                                SizedBox(width: 10),
+                                Text("Logout"),
+                              ],
+                            ),
+                          ),
+                        ];
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -174,6 +177,6 @@ class HomeHeader extends StatelessWidget {
     // If no shared preferences, then you might just reset the username.
 
     // For now, we'll navigate back to the login screen
-    Navigator.pushReplacementNamed(context, '/welcome');
+    Navigator.pushReplacementNamed(context, '/login');
   }
 }

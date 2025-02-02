@@ -157,6 +157,7 @@ class _InquriesScreenState extends State<InquriesScreen> {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(
             'INQURIES',
             style: const TextStyle(color: Colors.white),

@@ -147,7 +147,7 @@ class _CustomBannerState extends State<CustomBanner>
                       ),
                     ),
                     child: Image.asset(
-                      'assets/images/robot.png',
+                      'assets/images/robo2.png',
                       fit: BoxFit.contain,
                       height: 120,
                       width: 120,

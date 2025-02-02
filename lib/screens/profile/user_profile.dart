@@ -53,21 +53,24 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  void logout() {
+    // Here you can clear session or navigate to the login screen
+    Navigator.pushReplacementNamed(
+        context, '/login'); // Assuming you have a route for login screen
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeColor = Color(0xFF674AEF);
-    final secondaryColor = Color(0xFF9575CD);
+    final secondaryColor = Color.fromARGB(255, 143, 107, 205);
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout, color: themeColor),
-            onPressed: () {},
-          ),
-        ],
+        automaticallyImplyLeading:
+            false, // Add this line to remove the back button
+        actions: [],
       ),
       extendBodyBehindAppBar: true,
       body: isLoading
@@ -237,6 +240,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: logout,
+        backgroundColor: const Color.fromARGB(255, 203, 147, 245),
+        child: Icon(Icons.logout),
+        tooltip: 'Logout',
+      ),
     );
   }
 }
