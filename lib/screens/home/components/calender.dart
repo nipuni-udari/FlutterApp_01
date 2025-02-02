@@ -179,20 +179,37 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                                       : Colors.transparent,
                                   width: 1.5,
                                 ),
+                                // Add gradient background for today
+                                gradient: isToday
+                                    ? LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          const Color(0xFF674AEF)
+                                              .withOpacity(0.2),
+                                          const Color(0xFF674AEF)
+                                              .withOpacity(0.1),
+                                        ],
+                                      )
+                                    : null,
                               ),
-                              child: Center(
-                                child: Text(
-                                  details.date.day.toString(),
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: isToday
-                                        ? Colors.white
-                                        : hasEvent
+                              child: Stack(
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      details.date.day.toString(),
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        // Remove isToday color condition
+                                        color: hasEvent
                                             ? const Color(0xFF674AEF)
                                             : const Color(0xFF5A5A5A),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  // Add today indicator dot
+                                ],
                               ),
                             );
                           },
