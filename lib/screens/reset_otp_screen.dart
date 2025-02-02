@@ -248,7 +248,7 @@ class _ResetOtpScreenState extends State<ResetOtpScreen> {
 
                 // Resend Code
                 const Text(
-                  "Didn't receive any code?",
+                  "Didn't receive any code? move back to resend again",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -256,19 +256,6 @@ class _ResetOtpScreenState extends State<ResetOtpScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                GestureDetector(
-                  onTap: () {
-                    // Handle resend OTP
-                  },
-                  child: const Text(
-                    "Resend New Code",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 116, 86, 247),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

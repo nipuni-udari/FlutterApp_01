@@ -130,7 +130,7 @@ class _CustomBannerState extends State<CustomBanner>
                       Text(
                         "HRIS: ${widget.userHris}",
                         style: const TextStyle(
-                          color: Colors.white70,
+                          color: Color.fromARGB(255, 255, 255, 255),
                           fontSize: 14,
                         ),
                       ),

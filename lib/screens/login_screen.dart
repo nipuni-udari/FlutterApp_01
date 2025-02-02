@@ -439,11 +439,11 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         child: RichText(
           text: TextSpan(
-            text: "Don't have an account? ",
+            //text: "Don't have an account? ",
             style: const TextStyle(color: Colors.grey),
             children: [
               TextSpan(
-                text: "Sign up",
+                //text: "Sign up",
                 style: TextStyle(
                     color: myColor, fontWeight: FontWeight.bold, fontSize: 16),
               ),
