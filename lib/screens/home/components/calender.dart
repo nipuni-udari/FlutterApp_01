@@ -38,6 +38,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print(data);
         if (data['remarks'] != null) {
           setState(() {
             _appointments = data['remarks'].map<Appointment>((remark) {
@@ -45,7 +46,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 startTime: DateTime.parse(remark['action_date']),
                 endTime: DateTime.parse(remark['action_date'])
                     .add(Duration(hours: 1)),
-                subject: remark['remarks'],
+                subject:
+                    "🏢 ${remark['customer_company_name']}\n📝 ${remark['remarks']}",
                 color: const Color.fromARGB(255, 174, 115, 247),
                 isAllDay: true,
               );
