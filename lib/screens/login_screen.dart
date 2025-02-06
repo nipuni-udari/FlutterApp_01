@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:newapp/screens/forgot_password_screen.dart';
 import 'package:newapp/screens/home/home_screen.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -379,6 +380,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      _showAlert("Error", "No internet connection. Please check your network.");
+      return;
+    }
+
     try {
       final response = await http.post(
         Uri.parse(
@@ -407,12 +414,10 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } else {
         _showAlert(
-          "Error",
-          "Unexpected server response: ${response.statusCode}",
-        );
+            "Error", "Unexpected server response: ${response.statusCode}");
       }
     } catch (e) {
-      _showAlert("Error", "Connection failed. Error: $e");
+      _showAlert("Error", "Connection failed. Please try again.");
     }
   }
 

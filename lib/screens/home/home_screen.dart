@@ -7,10 +7,11 @@ import 'package:newapp/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'components/custom_bottom_navbar.dart';
-import 'package:newapp/screens/home/components/banner.dart';
+//import 'package:newapp/screens/home/components/banner.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = "/home";
@@ -25,6 +26,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkConnectivity(context);
+    });
+
+    Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkConnectivity(context);
+      });
+    });
+
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
@@ -70,6 +83,69 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushReplacementNamed(context, '/login');
   }
 
+  Future<void> _checkConnectivity(BuildContext context) async {
+    final List<ConnectivityResult> connectivityResult =
+        await (Connectivity().checkConnectivity());
+
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      // No internet connection
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No internet connection'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else if (connectivityResult.contains(ConnectivityResult.mobile)) {
+      // Mobile network available
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Connected to mobile network'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else if (connectivityResult.contains(ConnectivityResult.wifi)) {
+      // Wi-Fi is available
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Connected to Wi-Fi'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else if (connectivityResult.contains(ConnectivityResult.ethernet)) {
+      // Ethernet connection available
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Connected to Ethernet'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else if (connectivityResult.contains(ConnectivityResult.vpn)) {
+      // VPN connection active
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Connected via VPN'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else if (connectivityResult.contains(ConnectivityResult.bluetooth)) {
+      // Bluetooth connection available
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Connected via Bluetooth'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else if (connectivityResult.contains(ConnectivityResult.other)) {
+      // Connected to a network which is not in the above mentioned networks
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Connected to an unknown network'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> args =
@@ -107,13 +183,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
-                  // shadows: [
-                  //   Shadow(
-                  //     blurRadius: 5.0,
-                  //     color: Color.fromARGB(255, 255, 255, 255),
-                  //     offset: Offset(3.0, 3.0),
-                  //   ),
-                  // ],
                 ),
               ),
               actions: [
@@ -250,14 +319,6 @@ class HomeContent extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 16),
           child: Column(
             children: [
-              // Consumer<UserProvider>(
-              //   builder: (context, userProvider, _) {
-              //     return CustomBanner(
-              //       username: userProvider.username,
-              //       userHris: userProvider.userHris,
-              //     );
-              //   },
-              // ),
               SpecialSection(
                 onCardTap: (index) => onCardTap(), // Handle card tap here
               ),
