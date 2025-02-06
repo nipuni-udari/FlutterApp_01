@@ -48,7 +48,7 @@ class HomeHeader extends StatelessWidget {
                 shadows: [
                   Shadow(
                     blurRadius: 10.0,
-                    color: Color.fromARGB(255, 16, 16, 16),
+                    color: Color.fromARGB(255, 255, 255, 255),
                     offset: Offset(3.0, 3.0),
                   ),
                 ],

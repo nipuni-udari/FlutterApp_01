@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:newapp/user_provider.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -53,10 +54,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void logout() {
-    // Here you can clear session or navigate to the login screen
-    Navigator.pushReplacementNamed(
-        context, '/login'); // Assuming you have a route for login screen
+  void logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    // Clear saved credentials but keep the rememberUser flag
+    await prefs.remove('mobile');
+    await prefs.remove('password');
+
+    // Navigate to login screen
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
@@ -241,7 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: logout,
+        onPressed: () => logout(context), // Pass context here
         backgroundColor: const Color.fromARGB(255, 203, 147, 245),
         child: Icon(Icons.logout),
         tooltip: 'Logout',

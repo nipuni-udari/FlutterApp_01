@@ -40,6 +40,10 @@ class _LoginScreenState extends State<LoginScreen> {
         passwordController.text = savedPassword;
         rememberUser = savedRemember;
       });
+      // Trigger auto-login after the widget is built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _login();
+      });
     }
   }
 
@@ -389,6 +393,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final Map<String, dynamic> data = json.decode(response.body);
 
         if (data['success']) {
+          await _saveCredentials();
           Navigator.pushReplacementNamed(
             context,
             HomeScreen.routeName,

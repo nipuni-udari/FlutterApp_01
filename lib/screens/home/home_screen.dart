@@ -5,6 +5,7 @@ import 'package:newapp/screens/home/components/special_section.dart';
 import 'package:newapp/screens/profile/user_profile.dart';
 import 'package:newapp/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'components/custom_bottom_navbar.dart';
 import 'package:newapp/screens/home/components/banner.dart';
 import 'package:flutter/services.dart';
@@ -59,7 +60,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _logout(BuildContext context) {
+  void _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    // Clear saved credentials but keep the rememberUser flag
+    await prefs.remove('mobile');
+    await prefs.remove('password');
+
+    // Navigate to login screen
     Navigator.pushReplacementNamed(context, '/login');
   }
 
@@ -100,13 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
-                  shadows: [
-                    Shadow(
-                      blurRadius: 10.0,
-                      color: Color.fromARGB(255, 16, 16, 16),
-                      offset: Offset(3.0, 3.0),
-                    ),
-                  ],
+                  // shadows: [
+                  //   Shadow(
+                  //     blurRadius: 5.0,
+                  //     color: Color.fromARGB(255, 255, 255, 255),
+                  //     offset: Offset(3.0, 3.0),
+                  //   ),
+                  // ],
                 ),
               ),
               actions: [
@@ -243,14 +250,14 @@ class HomeContent extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 16),
           child: Column(
             children: [
-              Consumer<UserProvider>(
-                builder: (context, userProvider, _) {
-                  return CustomBanner(
-                    username: userProvider.username,
-                    userHris: userProvider.userHris,
-                  );
-                },
-              ),
+              // Consumer<UserProvider>(
+              //   builder: (context, userProvider, _) {
+              //     return CustomBanner(
+              //       username: userProvider.username,
+              //       userHris: userProvider.userHris,
+              //     );
+              //   },
+              // ),
               SpecialSection(
                 onCardTap: (index) => onCardTap(), // Handle card tap here
               ),

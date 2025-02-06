@@ -125,7 +125,10 @@ flutter:
     - assets/images/user_avatar.jpg
     - assets/images/profile_bg.png
     - assets/images/robo2.png
-    
+    - assets/images/circuit_pattern.png
+    - assets/images/binary_particles.png
+
+    - assets/images/elec.jpg
 
 
 

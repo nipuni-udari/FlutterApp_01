@@ -28,8 +28,8 @@ class WelcomeScreenState extends State<WelcomeScreen> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF674AEF),
-                  Color.fromARGB(255, 11, 4, 43),
+                  Color.fromARGB(255, 104, 80, 212),
+                  Color.fromARGB(255, 255, 255, 255),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
